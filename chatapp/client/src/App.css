@@ -32,7 +32,18 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
+}
+
+.chat-box {
+  border: 10px solid #2f8f4c;
+}
+
+.message-user {
+  font-weight: bold;
+  margin-right: 10px;
+  /* text-align: left; */
 }
