@@ -17,7 +17,7 @@ function Chat() {
             <div className="container">
                 <div className="row">
                     <div className="col-md-2">
-                        <div className="user-list-box border">
+                        <div className="user-list-box border" style={{ minHeight: '475px', overflowY: 'auto' }}>
                             <h4 className="user-list-heading border">Users</h4>
                             <ul className="list-unstyled">
                                 <li>User 1</li>
@@ -30,11 +30,11 @@ function Chat() {
                     <div className="col-md-10">
                         <div className="row h-100">
                             <div className="col-md-12">
-                                <div className="chat-box border-primary h-100 overflow-auto" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                                <div className="chat-box border-primary h-100 overflow-auto" style={{ minHeight: '400px', maxHeight: "400px", overflowY: 'auto' }}>
                                     {messages.map((message, index) => {
                                         return (
                                             <div className="outgoing-message" key={index}>
-                                                <span className="message-user">You:</span> {message}
+                                                <span className="message-user pull-left">You:</span> {message}
                                             </div>
                                         );
                                     })}
@@ -46,13 +46,13 @@ function Chat() {
                                     onSubmit={handleSubmit}
                                 >
                                     <input
-                                        className="form-control w-100"
+                                        className="form-control w-100 border-primary"
                                         type="text"
                                         placeholder="Enter your message here"
                                         aria-label="Search"
                                         name="message"
                                     />
-                                    <button className="btn btn-outline-success" type="submit">Send</button>
+                                    <button className="btn btn-outline-success border-primary" type="submit">Send</button>
                                 </form>
                             </div>
                         </div>
