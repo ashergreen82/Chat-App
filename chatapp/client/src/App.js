@@ -1,11 +1,12 @@
 import './App.css';
 import Chat from "./Chat";
+import Login from './Login';
 
 function App() {
   return (
     <div className="App">
       <div className="container">
-        <Chat />
+        <Login />
       </div>
     </div>
   );
