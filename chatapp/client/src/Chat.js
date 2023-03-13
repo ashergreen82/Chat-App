@@ -17,8 +17,8 @@ function Chat({ username, handleLogout }) {
             <div className="container">
                 <div className="row">
                     <div className="col-md-2">
-                        <div className="user-list-box border" style={{ minHeight: '475px', overflowY: 'auto' }}>
-                            <h4 className="user-list-heading border">Users</h4>
+                        <div className="user-list-box border border-primary" style={{ minHeight: '475px', overflowY: 'auto' }}>
+                            <h4 className="user-list-heading border border-primary">Users</h4>
                             <ul className="list-unstyled">
                                 <li>{username}</li>
                                 <li>User 2</li>
