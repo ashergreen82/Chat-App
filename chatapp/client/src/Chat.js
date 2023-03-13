@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Login from './Login';
 
-function Chat() {
+function Chat({ username, handleLogout }) {
     const [messages, setMessages] = useState([])
 
     const handleSubmit = (event) => {
@@ -21,7 +21,7 @@ function Chat() {
                         <div className="user-list-box border" style={{ minHeight: '475px', overflowY: 'auto' }}>
                             <h4 className="user-list-heading border">Users</h4>
                             <ul className="list-unstyled">
-                                <li>User 1</li>
+                                <li>{username}</li>
                                 <li>User 2</li>
                                 <li>User 3</li>
                                 <li>User 4</li>
@@ -35,7 +35,7 @@ function Chat() {
                                     {messages.map((message, index) => {
                                         return (
                                             <div className="outgoing-message" key={index}>
-                                                <span className="message-user pull-left">You:</span> {message}
+                                                <span className="message-user pull-left">{username}:</span> {message}
                                             </div>
                                         );
                                     })}

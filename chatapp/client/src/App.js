@@ -11,17 +11,34 @@ function App() {
   const [isNewUser, setIsNewUser] = useState(false);
 
   const handleLogin = (event) => {
-    // event.preventDefault();
-    const storedUser = localStorage.getItem(username);
-    if (storedUser && storedUser.password === password) {
-      handleLogin(username);
-    } else {
-      alert('Invalid username or password');
+    event.preventDefault();
+    // let storedUser;
+    try {
+      const storedUser = JSON.parse(localStorage.getItem(username));
+      // storedUser = JSON.parse(localStorage.getItem(username));
+      console.log("App.js: storedUser item is ", storedUser);
+      console.log("App.js: password value in handleLogin function is ", password);
+      console.log("username value in App.js (before IF statements) is: ", username);
+      console.log("storedUser.password value in App.js (before IF statements) is: ", storedUser.password);
+      if (storedUser && storedUser.password === password) {
+        setUsername(username);
+        setIsLoggedIn(true);
+        console.log("username value in App.js is: ", username)
+        console.log("Congratulations!!!  You remembered your username and password!!!!")
+      } else {
+        console.log("username value in App.js (else statement) is: ", username)
+        console.log("storedUser value in App.js (else statement) is: ", storedUser)
+        console.log("storedUser.password value in App.js (else statement) is: ", storedUser.password)
+        alert('Invalid username or password');
+      }
+    } catch (event) {
+      alert("Invalid username or password App.js:handleLogin");
+      return;
     }
   };
 
   const handleRegister = (event) => {
-    // event.preventDefault();
+    event.preventDefault();
     if (password === confirmPassword) {
       localStorage.setItem(username, JSON.stringify({ password }));
       handleRegister({ username, password });
@@ -70,9 +87,6 @@ function App() {
 }
 
 export default App;
-
-
-
 
 // import './App.css';
 // import Chat from "./Chat";
