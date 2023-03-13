@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import Login from './Login';
 
 function Chat({ username, handleLogout }) {
     const [messages, setMessages] = useState([])
