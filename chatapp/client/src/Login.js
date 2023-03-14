@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function Login({ handleLogin, handleRegister, isLoggedIn, setIsLoggedIn, username, setUsername, password, setPassword, confirmPassword, setConfirmPassword, isNewUser, setIsNewUser }) {
+function Login({ handleLogin, handleRegister, username, setUsername, password, setPassword, confirmPassword, setConfirmPassword, isNewUser, setIsNewUser }) {
     //     const [username, setUsername] = useState('');
     //     const [password, setPassword] = useState('');
     //     const [confirmPassword, setConfirmPassword] = useState('');
