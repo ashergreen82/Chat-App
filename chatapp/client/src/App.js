@@ -64,8 +64,6 @@ function App() {
           <Login
             handleLogin={handleLogin}
             handleRegister={handleRegister}
-            isLoggedIn={isLoggedIn}
-            setIsLoggedIn={setIsLoggedIn}
             username={username}
             setUsername={setUsername}
             password={password}
