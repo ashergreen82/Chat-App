@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import usersData from './users.json';
 
 function Chat({ username, handleLogout }) {
     const [messages, setMessages] = useState([])
+    const users = usersData.users;
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -21,9 +23,12 @@ function Chat({ username, handleLogout }) {
                             <h4 className="user-list-heading border border-primary border-2">Users</h4>
                             <ul className="list-unstyled">
                                 <li>{username}</li>
-                                <li>User 2</li>
+                                {users.map((user) => (
+                                    <li key={user.user_id}>{user.user_name}</li>
+                                ))}
+                                {/* <li>User 2</li>
                                 <li>User 3</li>
-                                <li>User 4</li>
+                                <li>User 4</li> */}
                             </ul>
                         </div>
                     </div>
