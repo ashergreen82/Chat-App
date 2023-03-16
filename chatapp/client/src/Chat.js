@@ -24,7 +24,7 @@ function Chat({ username, handleLogout }) {
                             <ul className="list-unstyled">
                                 <li>{username}</li>
                                 {users.map((user) => (
-                                    <li key={user.user_id}>{user.user_name}</li>
+                                    <li key={user.id}>{user.name}</li>
                                 ))}
                                 {/* <li>User 2</li>
                                 <li>User 3</li>
