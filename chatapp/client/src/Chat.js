@@ -41,9 +41,6 @@ function Chat({ username, handleLogout }) {
                                 {users.map((user) => (
                                     <li key={user.id}>{user.name}</li>
                                 ))}
-                                {/* <li>User 2</li>
-                                <li>User 3</li>
-                                <li>User 4</li> */}
                             </ul>
                         </div>
                     </div>
