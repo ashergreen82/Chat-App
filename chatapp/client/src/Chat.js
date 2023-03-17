@@ -1,14 +1,29 @@
 import { useState } from 'react';
 import usersData from './users.json';
+import messagesData from './messages.json';
 
 function Chat({ username, handleLogout }) {
-    const [messages, setMessages] = useState([])
+    // const [messages, setMessages] = useState([])
+    const [messages, setMessages] = useState(messagesData.messages);
     const users = usersData.users;
+
+    // const handleSubmit = (event) => {
+    //     event.preventDefault();
+    //     const messageInput = event.target.elements.message;
+    //     const newMessage = messageInput.value;
+    //     setMessages([...messages, newMessage]);
+    //     messageInput.value = '';
+    // };
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const messageInput = event.target.elements.message;
-        const newMessage = messageInput.value;
+        const newMessageContent = messageInput.value;
+        const newMessage = {
+            message_id: messages.length + 1,
+            user_name: username,
+            message: newMessageContent,
+        };
         setMessages([...messages, newMessage]);
         messageInput.value = '';
     };
@@ -36,13 +51,32 @@ function Chat({ username, handleLogout }) {
                         <div className="row h-100">
                             <div className="col-md-12">
                                 <div className="chat-box border-primary h-100 overflow-auto" style={{ minHeight: '400px', maxHeight: "400px", overflowY: 'auto' }}>
-                                    {messages.map((message, index) => {
+                                    {/* {messages.map((message, index) => {
                                         return (
                                             <div className="outgoing-message" key={index}>
                                                 <span className="message-user pull-left">{username}:</span> {message}
                                             </div>
                                         );
-                                    })}
+                                    })} */}
+                                    {messages.map((message) => (
+                                        <div className="outgoing-message" key={message.message_id}>
+                                            <span className="message-user pull-left">{message.user_name}:</span> {message.message}
+                                        </div>
+                                    ))}
+                                    {/* {messagesData.messages.map((message) => {
+                                        return (
+                                            <div className="outgoing-message" key={message.message_id}>
+                                                <span className="message-user pull-left">{message.user_name}:</span> {message.message}
+                                            </div>
+                                        );
+                                    })} */}
+                                    {/* {messages.map((message) => {
+                                        return (
+                                            <div className="outgoing-message" key={message.message_id}>
+                                                <span className="message-user pull-left">{username}:</span> {message}
+                                            </div>
+                                        );
+                                    })} */}
                                 </div>
                             </div>
                             <div className="col-md-12">
