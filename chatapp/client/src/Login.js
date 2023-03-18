@@ -1,30 +1,6 @@
 import { useState } from 'react';
 
 function Login({ handleLogin, handleRegister, username, setUsername, password, setPassword, confirmPassword, setConfirmPassword, isNewUser, setIsNewUser }) {
-    //     const [username, setUsername] = useState('');
-    //     const [password, setPassword] = useState('');
-    //     const [confirmPassword, setConfirmPassword] = useState('');
-    // const [isNewUser, setIsNewUser] = useState(false);
-
-    // const handleLogin = (event) => {
-    //     event.preventDefault();
-    //     const storedUser = localStorage.getItem(username);
-    //     if (storedUser && storedUser.password === password) {
-    //         props.handleLogin(username);
-    //     } else {
-    //         alert('Invalid username or password');
-    //     }
-    // };
-
-    // const handleRegister = (event) => {
-    //     event.preventDefault();
-    //     if (password === confirmPassword) {
-    //         localStorage.setItem(username, JSON.stringify({ password }));
-    //         props.handleRegister({ username, password });
-    //     } else {
-    //         alert('Passwords do not match');
-    //     }
-    // };
 
     const toggleNewUser = () => {
         setIsNewUser(!isNewUser);
