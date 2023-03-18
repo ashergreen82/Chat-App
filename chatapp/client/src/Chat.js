@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import usersData from './users.json';
 import messagesData from './messages.json';
 
@@ -6,6 +6,7 @@ function Chat({ username, handleLogout }) {
     // const [messages, setMessages] = useState([])
     const [messages, setMessages] = useState(messagesData.messages);
     const users = usersData.users;
+    const chatBoxRef = useRef(null);
 
     // const handleSubmit = (event) => {
     //     event.preventDefault();
@@ -15,6 +16,7 @@ function Chat({ username, handleLogout }) {
     //     messageInput.value = '';
     // };
 
+    // Handles messages entered by the user
     const handleSubmit = (event) => {
         event.preventDefault();
         const messageInput = event.target.elements.message;
@@ -27,6 +29,13 @@ function Chat({ username, handleLogout }) {
         setMessages([...messages, newMessage]);
         messageInput.value = '';
     };
+
+    // Scroll to the bottom of the message container when a new message is received
+    useEffect(() => {
+        if (chatBoxRef && chatBoxRef.current) {
+            chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
+        }
+    }, [messages]);
 
     return (
         <>
@@ -47,7 +56,7 @@ function Chat({ username, handleLogout }) {
                     <div className="col-md-10">
                         <div className="row h-100">
                             <div className="col-md-12">
-                                <div className="chat-box border-primary h-100 overflow-auto" style={{ minHeight: '400px', maxHeight: "400px", overflowY: 'auto' }}>
+                                <div className="chat-box border-primary h-100 overflow-auto" style={{ minHeight: '400px', maxHeight: "400px", overflowY: 'auto' }} ref={chatBoxRef}>
                                     {/* {messages.map((message, index) => {
                                         return (
                                             <div className="outgoing-message" key={index}>
