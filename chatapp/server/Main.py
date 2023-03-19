@@ -11,10 +11,11 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 json_file_path = os.path.join(dir_path, '..', 'client', 'src', 'users.json')
 
 # load the user information from the JSON file
-# with open('user.json') as f:
+# with open('users.json') as f:
 #     user_data = json.load(f)
 with open(json_file_path, 'r') as f:
     user_data = json.load(f)
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -30,6 +31,7 @@ def login():
 
     # if no user was found, return an error message
     return jsonify({'message': 'invalid username or password'})
+
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -56,6 +58,7 @@ def register():
         json.dump(user_data, f)
 
     return jsonify({'message': 'registration successful'})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
