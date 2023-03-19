@@ -1,8 +1,10 @@
 from flask import Flask, request, jsonify
+from flask_restful import Resource, Api
 import os
 import json
 
 app = Flask(__name__)
+api = Api(app)
 
 # Get the current directory of the Main.py file
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -23,6 +25,10 @@ def login():
     data = request.json
     username = data.get('username')
     password = data.get('password')
+    print(f"data from request.json: {data}")
+    print(f"Username recieved: {username}")
+    print(f"Password recieved: {password}")
+    print(f"user_data: {user_data}")
 
     # find the user with the matching username and password
     for user in user_data['users']:
