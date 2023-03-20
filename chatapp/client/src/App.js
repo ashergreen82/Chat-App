@@ -18,7 +18,7 @@ function App() {
       password: password
     })
       .then(response => {
-        if (response.data.success) {
+        if (response.data.message == "login successful") {
           setUsername(username);
           setIsLoggedIn(true);
           console.log("username value in App.js is: ", username)
