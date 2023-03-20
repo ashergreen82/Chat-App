@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
+from flask_cors import CORS
 import os
 import json
 
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 
 # Get the current directory of the Main.py file
 dir_path = os.path.dirname(os.path.realpath(__file__))
