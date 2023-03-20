@@ -80,11 +80,28 @@ function App() {
   const handleRegister = (event) => {
     event.preventDefault();
     if (password === confirmPassword) {
-      localStorage.setItem(username, JSON.stringify({ password }));
-      registerUser({ username, password });
+      axios.post('http://localhost:5000/register', {
+        username: username,
+        password: password
+      })
+        .then(response => {
+          localStorage.setItem(username, JSON.stringify({ password }));
+          handleLogin(event);
+        })
+        .catch(error => {
+          console.log(error);
+          alert('Error registering user');
+        });
     } else {
       alert('Passwords do not match');
     }
+
+    // if (password === confirmPassword) {
+    //   localStorage.setItem(username, JSON.stringify({ password }));
+    //   registerUser({ username, password });
+    // } else {
+    //   alert('Passwords do not match');
+    // }
   };
 
   const registerUser = ({ username, password }) => {
