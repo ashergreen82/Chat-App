@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 function Login({ handleLogin, handleRegister, username, setUsername, password, setPassword, confirmPassword, setConfirmPassword, isNewUser, setIsNewUser }) {
 
+    // Determins if there is new user or not.
     const toggleNewUser = () => {
         setIsNewUser(!isNewUser);
         setUsername('');
