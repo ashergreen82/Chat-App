@@ -1,6 +1,4 @@
-import { useState } from 'react';
-
-function Login({ handleLogin, handleRegister, username, setUsername, password, setPassword, confirmPassword, setConfirmPassword, isNewUser, setIsNewUser }) {
+function Login({ handleLogin, registerUser, username, setUsername, password, setPassword, confirmPassword, setConfirmPassword, isNewUser, setIsNewUser }) {
 
     // Determins if there is new user or not.
     const toggleNewUser = () => {
@@ -13,7 +11,7 @@ function Login({ handleLogin, handleRegister, username, setUsername, password, s
     return (
         <div>
             {isNewUser ? (
-                <form onSubmit={handleRegister}>
+                <form onSubmit={registerUser}>
                     <div>
                         <label>New Username:</label>
                         <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />

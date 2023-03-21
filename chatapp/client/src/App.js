@@ -18,7 +18,7 @@ function App() {
       password: password
     })
       .then(response => {
-        if (response.data.message == "login successful") {
+        if (response.data.message === "login successful") {
           setUsername(username);
           setIsLoggedIn(true);
           console.log("username value in App.js is: ", username)
@@ -77,7 +77,7 @@ function App() {
     // }
   };
 
-  const handleRegister = (event) => {
+  const registerUser = (event) => {
     event.preventDefault();
     if (password === confirmPassword) {
       axios.post('http://localhost:5000/register', {
@@ -85,8 +85,13 @@ function App() {
         password: password
       })
         .then(response => {
-          localStorage.setItem(username, JSON.stringify({ password }));
-          handleLogin(event);
+          if (response.data.message === "username already taken") {
+            alert("That Username is already taken, please select another Username")
+          } else {
+            console.log("User login successful")
+            alert("WELCOME TO THE CHAT LAIR!!!!")
+            handleLogin(event);
+          }
         })
         .catch(error => {
           console.log(error);
@@ -104,27 +109,27 @@ function App() {
     // }
   };
 
-  const registerUser = ({ username, password }) => {
-    fetch('http://localhost:5000/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      mode: 'no-cors',
-      body: JSON.stringify({ username, password })
-    })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          setUsername(username);
-          setIsLoggedIn(true);
-          console.log("username value in App.js is: ", username)
-          console.log("Congratulations!!!  You have successfully registered and logged in!!!!")
-        } else {
-          alert('Registration failed');
-        }
-      });
-  };
+  // const registerUser = ({ username, password }) => {
+  //   fetch('http://localhost:5000/register', {
+  //     method: 'POST',
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     mode: 'no-cors',
+  //     body: JSON.stringify({ username, password })
+  //   })
+  //     .then(response => response.json())
+  //     .then(data => {
+  //       if (data.success) {
+  //         setUsername(username);
+  //         setIsLoggedIn(true);
+  //         console.log("username value in App.js is: ", username)
+  //         console.log("Congratulations!!!  You have successfully registered and logged in!!!!")
+  //       } else {
+  //         alert('Registration failed');
+  //       }
+  //     });
+  // };
   // const handleLogin = (username) => {
   //   setUsername(username);
   //   setIsLoggedIn(true);
@@ -141,7 +146,7 @@ function App() {
         {!isLoggedIn ? (
           <Login
             handleLogin={handleLogin}
-            handleRegister={handleRegister}
+            registerUser={registerUser}
             username={username}
             setUsername={setUsername}
             password={password}
