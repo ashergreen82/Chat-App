@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
-import usersData from './users.json';
+// import usersData from './users.json';
+import axios from 'axios';
 import messagesData from './messages.json';
 
 function Chat({ username, handleLogout }) {
     // const [messages, setMessages] = useState([])
     const [messages, setMessages] = useState(messagesData.messages);
-    const users = usersData.users;
+    const [users, setUsers] = useState([])
+    // const users = usersData.users;
     const chatBoxRef = useRef(null);
 
     // const handleSubmit = (event) => {
@@ -29,6 +31,13 @@ function Chat({ username, handleLogout }) {
         setMessages([...messages, newMessage]);
         messageInput.value = '';
     };
+
+    useEffect(() => {
+        // Fetch the list of users from the server when the component mounts
+        axios.get('/users')
+            .then(response => setUsers(response.data))
+            .catch(error => console.error(error));
+    }, []);
 
     // Scroll to the bottom of the message container when a new message is received
     useEffect(() => {
