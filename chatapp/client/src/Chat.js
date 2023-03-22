@@ -66,32 +66,11 @@ function Chat({ username, handleLogout }) {
                         <div className="row h-100">
                             <div className="col-md-12">
                                 <div className="chat-box border-primary h-100 overflow-auto" style={{ minHeight: '400px', maxHeight: "400px", overflowY: 'auto' }} ref={chatBoxRef}>
-                                    {/* {messages.map((message, index) => {
-                                        return (
-                                            <div className="outgoing-message" key={index}>
-                                                <span className="message-user pull-left">{username}:</span> {message}
-                                            </div>
-                                        );
-                                    })} */}
                                     {messages.map((message) => (
                                         <div className="outgoing-message" key={message.message_id}>
                                             <span className="message-user pull-left">{message.user_name}:</span> {message.message}
                                         </div>
                                     ))}
-                                    {/* {messagesData.messages.map((message) => {
-                                        return (
-                                            <div className="outgoing-message" key={message.message_id}>
-                                                <span className="message-user pull-left">{message.user_name}:</span> {message.message}
-                                            </div>
-                                        );
-                                    })} */}
-                                    {/* {messages.map((message) => {
-                                        return (
-                                            <div className="outgoing-message" key={message.message_id}>
-                                                <span className="message-user pull-left">{username}:</span> {message}
-                                            </div>
-                                        );
-                                    })} */}
                                 </div>
                             </div>
                             <div className="col-md-12">
