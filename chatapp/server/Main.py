@@ -62,7 +62,7 @@ def register():
     user_data['users'].append(new_user)
 
     # save the updated user data to the JSON file
-    with open('user.json', 'w') as f:
+    with open(json_file_path, 'w') as f:
         json.dump(user_data, f)
 
     return jsonify({'message': 'registration successful'})
