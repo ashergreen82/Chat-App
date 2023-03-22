@@ -71,6 +71,8 @@ def register():
 @app.route('/users', methods=['GET'])
 def get_users():
     # Sends the list of users to the client
+    test = jsonify({'users': user_data['users']})
+    print(f"List of users to be printed in user box {test}")
     return jsonify({'users': user_data['users']})
 
 
