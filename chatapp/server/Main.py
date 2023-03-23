@@ -20,6 +20,16 @@ json_file_path = os.path.join(dir_path, '..', 'client', 'src', 'users.json')
 with open(json_file_path, 'r') as f:
     user_data = json.load(f)
 
+# Specify path to the userlogin.json file which holds the informatoin on who is logged in.
+userlogin_file_path = os.path.join(os.path.dirname(__file__), 'userlogin.json')
+
+# load the userlogin information from the userlogin JSON file
+if os.path.exists(userlogin_file_path) and os.path.getsize(userlogin_file_path) > 0:
+    with open(userlogin_file_path, 'r') as f:
+        userlogin_data = json.load(f)
+else:
+    userlogin_data = {}
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -35,6 +45,16 @@ def login():
     # find the user with the matching username and password
     for user in user_data['users']:
         if user['name'] == username and user['password'] == password:
+            with open(userlogin_file_path, 'r') as f:
+                userlogin_data = json.load(f)
+
+            if 'users' not in userlogin_data:
+                userlogin_data['users'] = []
+
+            userlogin_data['users'].append({'name': username})
+            with open(userlogin_file_path, 'w') as f:
+                json.dump(userlogin_data, f)
+
             return jsonify({'message': 'login successful'})
 
     # if no user was found, return an error message
@@ -71,9 +91,27 @@ def register():
 @app.route('/users', methods=['GET'])
 def get_users():
     # Sends the list of users to the client
-    test = jsonify({'users': user_data['users']})
+    test = jsonify({'users': userlogin_data['users']})
     print(f"List of users to be printed in user box {test}")
-    return jsonify({'users': user_data['users']})
+    return jsonify({'users': userlogin_data['users']})
+
+
+@app.route('/logout', methods=['POST'])
+def logout():
+    # get the username from the request
+    data = request.json
+    username = data.get('username')
+
+    # remove the user from the userlogin file to mark them as logged out
+    with open(userlogin_file_path, 'r') as f:
+        userlogin_data = json.load(f)
+
+    userlogin_data['users'] = [
+        user for user in userlogin_data['users'] if user['name'] != username]
+    with open(userlogin_file_path, 'w') as f:
+        json.dump(userlogin_data, f)
+
+    return jsonify({'message': 'logout successful'})
 
 
 if __name__ == '__main__':
