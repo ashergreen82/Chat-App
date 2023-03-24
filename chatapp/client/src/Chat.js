@@ -33,9 +33,10 @@ function Chat({ username, handleLogout }) {
     };
 
     useEffect(() => {
+        console.log("useEffect function to list users has ran")
         // Fetch the list of users from the server when the component mounts
-        axios.get('/users')
-            .then(response => setUsers(response.data))
+        axios.get('http://localhost:5000/users')
+            .then(response => setUsers(response.data.users))
             .catch(error => console.error(error));
     }, []);
 
