@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from flask_cors import CORS
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import json
 
@@ -86,7 +86,7 @@ def register():
         'id': len(user_data['users']) + 1,
         'name': username,
         'password': password,
-        'last_active_at': datetime.now()
+        'last_active_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     user_data['users'].append(new_user)
 
@@ -100,9 +100,22 @@ def register():
 @app.route('/users', methods=['GET'])
 def get_users():
     # Sends the list of users to the client
-    test = jsonify({'users': user_data['users']})
-    print(f"List of users to be printed in user box {test}")
-    return jsonify({'users': user_data['users']})
+    one_hour_ago = datetime.now() - timedelta(hours=1)
+
+    active_users = []
+    for user in user_data['users']:
+        # Convert the last_active_at value to a datetime object
+        last_active_at = datetime.strptime(
+            user['last_active_at'], '%Y-%m-%d %H:%M:%S')
+
+        # Compare the last_active_at value with the time one hour ago
+        if last_active_at > one_hour_ago:
+            active_users.append(user)
+
+    # Sends the list of active users to the client
+    response = jsonify({'users': active_users})
+    print(f"List of users to be printed in user box: {active_users}")
+    return response
 
 
 @app.route('/logout', methods=['POST'])

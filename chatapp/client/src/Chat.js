@@ -57,9 +57,16 @@ function Chat({ username, handleLogout }) {
                             <h4 className="user-list-heading border border-primary border-2">Users</h4>
                             <ul className="list-unstyled">
                                 <li>{username}</li>
-                                {users.map((user) => (
+                                {users.map((user) => {
+                                    if (user.name !== username) {
+                                        return <li key={user.id}>{user.name}</li>;
+                                    } else {
+                                        return null;
+                                    }
+                                })}
+                                {/* {users.map((user) => (
                                     <li key={user.id}>{user.name}</li>
-                                ))}
+                                ))} */}
                             </ul>
                         </div>
                     </div>
