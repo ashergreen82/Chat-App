@@ -1,22 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 // import usersData from './users.json';
 import axios from 'axios';
-import messagesData from './messages.json';
+// import messagesData from './messages.json';
 
 function Chat({ username, handleLogout }) {
     // const [messages, setMessages] = useState([])
-    const [messages, setMessages] = useState(messagesData.messages);
+    const [messages, setMessages] = useState([]);
     const [users, setUsers] = useState([])
     // const users = usersData.users;
     const chatBoxRef = useRef(null);
-
-    // const handleSubmit = (event) => {
-    //     event.preventDefault();
-    //     const messageInput = event.target.elements.message;
-    //     const newMessage = messageInput.value;
-    //     setMessages([...messages, newMessage]);
-    //     messageInput.value = '';
-    // };
 
     // Handles messages entered by the user
     const handleSubmit = (event) => {
@@ -32,12 +24,26 @@ function Chat({ username, handleLogout }) {
         messageInput.value = '';
     };
 
+    // Gets list of current logged in users and displayes them in the user box
     useEffect(() => {
         console.log("useEffect function to list users has ran")
         // Fetch the list of users from the server when the component mounts
         axios.get('http://localhost:5000/users')
             .then(response => setUsers(response.data.users))
             .catch(error => console.error(error));
+    }, []);
+
+    useEffect(() => {
+        async function fetchMessages() {
+            try {
+                const response = await fetch('http://localhost:5000/messages');
+                const messagesData = await response.json();
+                setMessages(messagesData.messages);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+        fetchMessages();
     }, []);
 
     // Scroll to the bottom of the message container when a new message is received
