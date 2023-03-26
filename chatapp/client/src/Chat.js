@@ -21,9 +21,9 @@ function Chat({ username, handleLogout }) {
                 user_name: username,
                 message: newMessageContent,
             });
-
-            const newMessage = response.data; // assuming the server returns the new message object
-            setMessages([...messages, newMessage]);
+            const newMessage = response.data;
+            // setMessages([...messages, newMessage]);
+            fetchUserMessage();
             messageInput.value = '';
         } catch (error) {
             console.error(error);
@@ -39,18 +39,30 @@ function Chat({ username, handleLogout }) {
             .catch(error => console.error(error));
     }, []);
 
+    // Gets the messasges from the server on startup
     useEffect(() => {
-        async function fetchMessages() {
+        const fetchMessages = async () => {
             try {
-                const response = await fetch('http://localhost:5000/messages');
-                const messagesData = await response.json();
-                setMessages(messagesData.messages);
+                const response = await axios.get('http://localhost:5000/messages');
+                setMessages(response.data.messages);
             } catch (error) {
                 console.error(error);
             }
-        }
+        };
+
         fetchMessages();
     }, []);
+
+    // This function allows the user who just submitted a message to see their message they just typed in.
+    // Adding the variable "messages" to the useEffect only causes unnessary pings to the server every second.
+    async function fetchUserMessage() {
+        try {
+            const response = await axios.get('http://localhost:5000/messages');
+            setMessages(response.data.messages);
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     // Scroll to the bottom of the message container when a new message is received
     useEffect(() => {

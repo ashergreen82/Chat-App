@@ -144,7 +144,7 @@ def messages():
         data = request.json
         user_name = data.get('user_name')
         message = data.get('message')
-        message_id = data.get('message_id')
+        message_id = len(messages_file_path) + 1
         message_timestamp = datetime.now().strftime(
             '%Y-%m-%d %H:%M:%S')
 
@@ -156,8 +156,13 @@ def messages():
             {'message_id': message_id, 'user_name': user_name, 'message': message, 'timestamp': message_timestamp})
         with open(messages_file_path, 'w') as f:
             json.dump(messages_data, f)
+        print(f"{user_name}'s message was added successfully")
+        print(f"Message added was: {message}")
 
-        return jsonify({'message': 'message added successfully'})
+        return jsonify({
+            'username': user_name,
+            'message_content': message
+        })
     else:
         # Retrieve all messages
         # messages_file_path = os.path.join(dir_path, 'messages.json')
