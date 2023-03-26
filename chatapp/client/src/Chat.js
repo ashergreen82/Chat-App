@@ -11,17 +11,23 @@ function Chat({ username, handleLogout }) {
     const chatBoxRef = useRef(null);
 
     // Handles messages entered by the user
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const messageInput = event.target.elements.message;
         const newMessageContent = messageInput.value;
-        const newMessage = {
-            message_id: messages.length + 1,
-            user_name: username,
-            message: newMessageContent,
-        };
-        setMessages([...messages, newMessage]);
-        messageInput.value = '';
+
+        try {
+            const response = await axios.post('http://localhost:5000/messages', {
+                user_name: username,
+                message: newMessageContent,
+            });
+
+            const newMessage = response.data; // assuming the server returns the new message object
+            setMessages([...messages, newMessage]);
+            messageInput.value = '';
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     // Gets list of current logged in users and displayes them in the user box
