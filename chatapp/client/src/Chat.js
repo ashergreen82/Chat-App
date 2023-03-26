@@ -64,9 +64,6 @@ function Chat({ username, handleLogout }) {
                                         return null;
                                     }
                                 })}
-                                {/* {users.map((user) => (
-                                    <li key={user.id}>{user.name}</li>
-                                ))} */}
                             </ul>
                         </div>
                     </div>
