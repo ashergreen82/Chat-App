@@ -144,6 +144,7 @@ def messages():
         user_name = data.get('user_name')
         message = data.get('message')
         message_id = data.get('message_id')
+        message_timestamp = data.get('timestamp')
 
         # Append the new message to the messages JSON file
         messages_file_path = os.path.join(dir_path, 'messages.json')
@@ -152,7 +153,7 @@ def messages():
 
         messages_data['messages'].append(
             # {'user_name': user_name, 'message': message, 'message_id': message_id}
-            {'message_id': message_id, 'user_name': user_name, 'message': message})
+            {'message_id': message_id, 'user_name': user_name, 'message': message, 'timestamp': message_timestamp})
         with open(messages_file_path, 'w') as f:
             json.dump(messages_data, f)
 
