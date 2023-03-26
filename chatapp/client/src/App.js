@@ -62,6 +62,7 @@ function App() {
   };
 
   const handleLogout = () => {
+    console.log("User", { username }, "has logged out")
     setIsLoggedIn(false);
     setUsername('');
   };

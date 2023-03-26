@@ -53,7 +53,7 @@ function Chat({ username, handleLogout }) {
         fetchMessages();
     }, []);
 
-    // This function allows the user who just submitted a message to see their message they just typed in.
+    // This function allows the user who just submitted a message to see their message they just typed in
     // Adding the variable "messages" to the useEffect only causes unnessary pings to the server every second.
     async function fetchUserMessage() {
         try {
@@ -116,6 +116,9 @@ function Chat({ username, handleLogout }) {
                                     />
                                     <button className="btn btn-outline-success border-primary" type="submit">Send</button>
                                 </form>
+                                <div className="d-flex justify-content-center mt-2">
+                                    <button className="btn btn-outline-success border-primary" type="button" onClick={handleLogout}>Logout</button>
+                                </div>
                             </div>
                         </div>
                     </div>
