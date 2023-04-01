@@ -11,7 +11,7 @@ conn = psycopg2.connect(
     port=5432,
     dbname="ChatApp",
     user="postgres",
-    password="foodfood"
+    password="Andy"
 )
 
 app = Flask(__name__)
