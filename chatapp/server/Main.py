@@ -1,9 +1,18 @@
+import psycopg2
 from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from flask_cors import CORS
 from datetime import datetime, timedelta
 import os
 import json
+
+conn = psycopg2.connect(
+    host="127.0.0.1",
+    port=5432,
+    dbname="ChatApp",
+    user="postgres",
+    password="foodfood"
+)
 
 app = Flask(__name__)
 api = Api(app)
