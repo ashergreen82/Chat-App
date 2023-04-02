@@ -43,8 +43,8 @@ cur.execute("SELECT * FROM messages")
 results = cur.fetchall()
 close_database_connection(conn, cur)
 
-print(results1)
-print(results)
+# print(results1)
+# print(results)
 
 # Get the current directory of the Main.py file
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -57,6 +57,7 @@ users_file_path = os.path.join(dir_path, '..', 'client', 'src', 'users.json')
 #     user_data = json.load(f)
 with open(users_file_path, 'r') as f:
     user_data = json.load(f)
+    # user_data_to_be_converted = user_data["users"]
 
 # Specify path to the userlogin.json file which holds the informatoin on who is logged in.
 userlogin_file_path = os.path.join(os.path.dirname(__file__), 'userlogin.json')
@@ -68,6 +69,69 @@ if os.path.exists(userlogin_file_path) and os.path.getsize(userlogin_file_path) 
 else:
     userlogin_data = {}
 
+# def insert_users(user_data):
+#     # Connect to the PostgreSQL database
+#     conn, cur = open_database_connection()
+#
+#     try:
+#         for user in user_data:
+#             cur.execute("""
+#                 INSERT INTO users (username, password, last_active_at)
+#                 VALUES (%s, %s, %s)
+#                 ON CONFLICT (username) DO NOTHING
+#             """, (user['name'], user['password'], user['last_active_at']))
+#
+#         # Commit the changes to the database
+#         conn.commit()
+#         print("User data inserted successfully!")
+#     except Exception as e:
+#         print(f"Error inserting user data: {e}")
+#
+#     # Close the PostgreSQL database connection
+#     close_database_connection(conn, cur)
+
+# insert_users(user_data_to_be_converted)
+
+# def insert_messages(message_data):
+#     # Assuming you have a connection to the database and a valid cursor object
+#     conn, cur = open_database_connection()
+#
+#     # Iterate through the messages and insert them into the database
+#     for message in message_data:
+#         user_name = message["user_name"]
+#         message_text = message["message"]
+#         timestamp = message["timestamp"]
+#
+#         # Get the user ID associated with the user_name
+#         cur.execute("SELECT id FROM users WHERE username = %s;", (user_name,))
+#         user_id_result = cur.fetchone()
+#
+#         # If a user with the given user_name exists, insert the message
+#         if user_id_result:
+#             user_id = user_id_result[0]
+#
+#             # Prepare the INSERT statement
+#             insert_query = """
+#             INSERT INTO messages (user_id, message, timestamp)
+#             VALUES (%s, %s, %s);
+#             """
+#
+#             # Execute the INSERT statement
+#             cur.execute(insert_query, (user_id, message_text, timestamp))
+#         else:
+#             print(f"No user found with the name: {user_name}")
+#
+#     # Commit the changes to the database
+#     conn.commit()
+#
+#     # Close the database connection
+#     close_database_connection(conn, cur)
+#
+# messages_file_path = os.path.join(dir_path, 'messages.json')
+# with open(messages_file_path, 'r') as f:
+#     messages_data = json.load(f)
+#     messages_data = messages_data["messages"]
+# insert_messages(messages_data)
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -208,7 +272,6 @@ def messages():
             messages_data = json.load(f)
 
         return jsonify({'messages': messages_data['messages']})
-
 
 if __name__ == '__main__':
     app.run(debug=True)
