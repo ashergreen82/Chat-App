@@ -6,17 +6,45 @@ from datetime import datetime, timedelta
 import os
 import json
 
-conn = psycopg2.connect(
-    host="127.0.0.1",
-    port=5432,
-    dbname="ChatApp",
-    user="postgres",
-    password="Andy"
-)
+def open_database_connection():
+    try:
+        conn = psycopg2.connect(
+            host="127.0.0.1",
+            port=5432,
+            dbname="ChatApp",
+            user="postgres",
+            password="Andy"
+        )
+        print("Database connected successfully!")
+
+        # Execute a dummy query to test the connection
+        cur = conn.cursor()
+        cur.execute("SELECT version();")
+        db_version = cur.fetchone()
+        print(f"PostgreSQL database version: {db_version[0]}")
+        return conn, cur
+
+    except Exception as e:
+        print(f"Error connecting to database: {e}")
+
+def close_database_connection(conn, cur):
+    cur.close()
+    conn.close()
+    print("Database connection closed.")
 
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
+
+conn, cur = open_database_connection()
+cur.execute("SELECT * FROM users")
+results1 = cur.fetchall()
+cur.execute("SELECT * FROM messages")
+results = cur.fetchall()
+close_database_connection(conn, cur)
+
+print(results1)
+print(results)
 
 # Get the current directory of the Main.py file
 dir_path = os.path.dirname(os.path.realpath(__file__))
