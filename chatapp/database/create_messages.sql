@@ -4,3 +4,9 @@ INSERT INTO public.messages(
 
 SELECT * FROM messages;
 SELECT * FROM users where id=1;
+SELECT * FROM users;
+SELECT id FROM users where username = 'David';
+
+BEGIN;
+DELETE FROM messages WHERE id = 2;
+COMMIT;
