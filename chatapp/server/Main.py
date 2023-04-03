@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 import os
 import json
 
+# Database connections
 def open_database_connection():
     try:
         conn = psycopg2.connect(
@@ -133,6 +134,7 @@ else:
 #     messages_data = messages_data["messages"]
 # insert_messages(messages_data)
 
+# User login process
 @app.route('/login', methods=['POST'])
 def login():
     # get the username and password from the request
@@ -144,32 +146,61 @@ def login():
     print(f"Password recieved: {password}")
     print(f"user_data: {user_data}")
     user_verified = False
-    # find the user with the matching username and password
-    for user in user_data['users']:
-        if user['name'] == username and user['password'] == password:
-            # with open(userlogin_file_path, 'r') as f:
-            #     userlogin_data = json.load(f)
-            user['last_active_at'] = datetime.now().strftime(
-                '%Y-%m-%d %H:%M:%S')
-            # if 'users' not in userlogin_data:
-            #     userlogin_data['users'] = []
-            user_name = user["name"]
-            user_date = user["last_active_at"]
-            # userlogin_data['users'].append({'name': username})
-            print(f"{user_name} logged in at {user_date}.")
-            user_verified = True
-            break
 
-    if user_verified:
-        with open(users_file_path, 'w') as f:
-            json.dump(user_data, f)
+    # find the user with the matching username and password
+    # Open a connection to the database
+    conn, cur = open_database_connection()
+
+    # Execute a SELECT statement to retrieve the user with the matching username and password
+    cur.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
+
+    # Fetch the results and store them in a variable
+    user = cur.fetchone()
+
+    # Close the database connection
+    close_database_connection(conn, cur)
+
+    # for user in user_data['users']:
+    #     if user['name'] == username and user['password'] == password:
+    #         # with open(userlogin_file_path, 'r') as f:
+    #         #     userlogin_data = json.load(f)
+    #         user['last_active_at'] = datetime.now().strftime(
+    #             '%Y-%m-%d %H:%M:%S')
+    #         # if 'users' not in userlogin_data:
+    #         #     userlogin_data['users'] = []
+    #         user_name = user["name"]
+    #         user_date = user["last_active_at"]
+    #         # userlogin_data['users'].append({'name': username})
+    #         print(f"{user_name} logged in at {user_date}.")
+    #         user_verified = True
+    #         break
+
+    # Check if a user was found with the matching username and password
+    if user is not None:
+        # Update the last_active_at value for the user in the database
+        conn, cur = open_database_connection()
+        cur.execute("UPDATE users SET last_active_at = NOW() WHERE id = %s", (user[0],))
+        close_database_connection(conn, cur)
+        user_name = user[1]
+        user_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        print(f"{user_name} logged in at {user_date}.")
+
         return jsonify({'message': 'login successful'})
 
     # if no user was found, return an error message
     else:
         return jsonify({'message': 'invalid username or password'})
 
+    # if user_verified:
+    #     with open(users_file_path, 'w') as f:
+    #         json.dump(user_data, f)
+    #     return jsonify({'message': 'login successful'})
+    #
+    # # if no user was found, return an error message
+    # else:
+    #     return jsonify({'message': 'invalid username or password'})
 
+# Creates a new user
 @app.route('/register', methods=['POST'])
 def register():
     # get the new user information from the request
@@ -177,45 +208,94 @@ def register():
     username = data.get('username')
     password = data.get('password')
 
+    # Open a connection to the database
+    conn, cur = open_database_connection()
+
     # check if the username is already taken
-    for user in user_data['users']:
-        if user['name'] == username:
-            return jsonify({'message': 'username already taken'})
+    cur.execute("SELECT * FROM Users WHERE username = %s", (username,))
+    existing_user = cur.fetchone()
+    if existing_user is not None:
+        # Close the database connection
+        close_database_connection(conn, cur)
+        return jsonify({'message': 'username already taken'})
+
+    # for user in user_data['users']:
+    #     if user['name'] == username:
+    #         return jsonify({'message': 'username already taken'})
 
     # create a new user with a unique ID
+    # new_user = {
+    #     'name': username,
+    #     'password': password,
+    #     'date_created': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+    #     'last_active_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    # }
     new_user = {
-        'id': len(user_data['users']) + 1,
         'name': username,
-        'password': password,
-        'last_active_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        'password': password
     }
-    user_data['users'].append(new_user)
+    # Insert the new user into the Users table
+    cur.execute("INSERT INTO Users (username, password, date_created, last_active_at) VALUES (%s, %s, NOW(), NOW())", (new_user['name'], new_user['password']))
+    conn.commit()
+
+    # Close the database connection
+    close_database_connection(conn, cur)
+    # new_user = {
+    #     'id': len(user_data['users']) + 1,
+    #     'name': username,
+    #     'password': password,
+    #     'last_active_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    # }
+    # user_data['users'].append(new_user)
 
     # save the updated user data to the JSON file
-    with open(users_file_path, 'w') as f:
-        json.dump(user_data, f)
+    # with open(users_file_path, 'w') as f:
+    #     json.dump(user_data, f)
 
     return jsonify({'message': 'registration successful'})
 
 
+# Sends the list of users to the client
 @app.route('/users', methods=['GET'])
 def get_users():
-    # Sends the list of users to the client
-    one_hour_ago = datetime.now() - timedelta(hours=1)
+    # one_hour_ago = datetime.now() - timedelta(hours=1)
 
-    active_users = []
-    for user in user_data['users']:
-        # Convert the last_active_at value to a datetime object
-        last_active_at = datetime.strptime(
-            user['last_active_at'], '%Y-%m-%d %H:%M:%S')
+    # Open a connection to the database
+    conn,cur = open_database_connection()
 
-        # Compare the last_active_at value with the time one hour ago
-        if last_active_at > one_hour_ago:
-            active_users.append(user)
+    # Execute a SELECT statement to retrieve active users from the database
+    cur.execute("SELECT * FROM users WHERE last_active_at > NOW() - INTERVAL '1 hour'")
+    active_users = cur.fetchall()
+
+    # Close the database connection
+    close_database_connection(conn, cur)
+
+    # for user in user_data['users']:
+    #     # Convert the last_active_at value to a datetime object
+    #     last_active_at = datetime.strptime(
+    #         user['last_active_at'], '%Y-%m-%d %H:%M:%S')
+
+        # # Compare the last_active_at value with the time one hour ago
+        # if last_active_at > one_hour_ago:
+        #     active_users.append(user)
+
+
+
+    # Convert the results to a list of dictionaries
+    active_users_list = []
+    for user in active_users:
+        user_dict = {
+            'id': user[0],
+            'username': user[1],
+            'password': user[2],
+            'created_on': user[3].strftime('%Y-%m-%d %H:%M:%S'),
+            'last_active_at': user[4].strftime('%Y-%m-%d %H:%M:%S')
+        }
+        active_users_list.append(user_dict)
 
     # Sends the list of active users to the client
-    response = jsonify({'users': active_users})
-    print(f"List of users to be printed in user box: {active_users}")
+    response = jsonify({'users': active_users_list})
+    print(f"List of users to be printed in user box: {active_users_list}")
     return response
 
 
