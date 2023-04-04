@@ -37,13 +37,6 @@ app = Flask(__name__)
 api = Api(app)
 CORS(app)
 
-conn, cur = open_database_connection()
-cur.execute("SELECT * FROM users")
-results1 = cur.fetchall()
-cur.execute("SELECT * FROM messages")
-results = cur.fetchall()
-close_database_connection(conn, cur)
-
 # print(results1)
 # print(results)
 
@@ -180,6 +173,7 @@ def login():
         # Update the last_active_at value for the user in the database
         conn, cur = open_database_connection()
         cur.execute("UPDATE users SET last_active_at = NOW() WHERE id = %s", (user[0],))
+        conn.commit()
         close_database_connection(conn, cur)
         user_name = user[1]
         user_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -320,23 +314,40 @@ def logout():
 @app.route('/messages', methods=['GET', 'POST'])
 def messages():
     messages_file_path = os.path.join(dir_path, 'messages.json')
+    # Add a new message
     if request.method == 'POST':
-        # Add a new message
         data = request.json
         user_name = data.get('user_name')
         message = data.get('message')
-        message_id = len(messages_file_path) + 1
-        message_timestamp = datetime.now().strftime(
-            '%Y-%m-%d %H:%M:%S')
+        # message_id = len(messages_file_path) + 1
+        # message_timestamp = datetime.now().strftime(
+        #     '%Y-%m-%d %H:%M:%S')
+
+        # Open a connection to the database
+        conn, cur = open_database_connection()
+
+        # Get the user ID for the given username
+        cur.execute("SELECT id FROM Users WHERE username = %s", (user_name,))
+        user = cur.fetchone()
+        if user is None:
+            # Close the database connection
+            close_database_connection(conn, cur)
+            return jsonify({'message': 'User not found'})
+
+        # Insert the new message into the Messages table
+        cur.execute("INSERT INTO Messages (user_id, message, timestamp) VALUES (%s, %s, NOW())", (user[0], message))
+        conn.commit()
+        # Close the database connection
+        close_database_connection(conn, cur)
 
         # Append the new message to the messages JSON file
-        with open(messages_file_path, 'r') as f:
-            messages_data = json.load(f)
-        messages_data['messages'].append(
-            # {'user_name': user_name, 'message': message, 'message_id': message_id}
-            {'message_id': message_id, 'user_name': user_name, 'message': message, 'timestamp': message_timestamp})
-        with open(messages_file_path, 'w') as f:
-            json.dump(messages_data, f)
+        # with open(messages_file_path, 'r') as f:
+        #     messages_data = json.load(f)
+        # messages_data['messages'].append(
+        #     # {'user_name': user_name, 'message': message, 'message_id': message_id}
+        #     {'message_id': message_id, 'user_name': user_name, 'message': message, 'timestamp': message_timestamp})
+        # with open(messages_file_path, 'w') as f:
+        #     json.dump(messages_data, f)
         print(f"{user_name}'s message was added successfully")
         print(f"Message added was: {message}")
 
@@ -346,12 +357,31 @@ def messages():
         })
     else:
         # Retrieve all messages
+        # Open a connection to the database
+        conn, cur = open_database_connection()
+
+        # Select all messages from the Messages table
+        # cur.execute("SELECT * FROM Messages ORDER BY timestamp")
+        cur.execute(
+            "SELECT Messages.id, Users.username, Messages.message, Messages.timestamp FROM Messages JOIN Users ON Messages.user_id = Users.id")
+        messages_input = cur.fetchall()
+        messages = []
+        for row in messages_input:
+            messages.append({
+                'message_id': row[0],
+                'message': row[2],
+                'username': row[1],
+                'timestamp': row[3].strftime('%Y-%m-%d %H:%M:%S')
+            })
+
+        # Close the database connection
+        close_database_connection(conn, cur)
         # messages_file_path = os.path.join(dir_path, 'messages.json')
         # messages_file_path = os.path.join('client', 'src', 'messages.json')
-        with open(messages_file_path, 'r') as f:
-            messages_data = json.load(f)
+        # with open(messages_file_path, 'r') as f:
+        #     messages_data = json.load(f)
 
-        return jsonify({'messages': messages_data['messages']})
+        return jsonify({'messages': messages})
 
 if __name__ == '__main__':
     app.run(debug=True)
