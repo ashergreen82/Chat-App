@@ -1,25 +1,34 @@
-import psycopg2
+useEffect(() => {
+    // If there's no socket, don't do anything
+    if (!socket) return;
 
-try:
-conn = psycopg2.connect(
-    host = "127.0.0.1",
-    port = 5432,
-    dbname = "ChatApp",
-    user = "postgres",
-    password = "Andy"
-)
-print("Database connected successfully!")
+    // When the 'new_message' event is received from the server, this function is called
+    // The 'message' parameter contains the new message data
+    socket.on('new_message', (message) => {
+        // Update the 'messages' state by creating a new array with the previous messages and the new message
+        setMessages((prevMessages) => [...prevMessages, message]);
+    });
 
-    # Execute a dummy query to test the connection
-cur = conn.cursor()
-cur.execute("SELECT version();")
-db_version = cur.fetchone()
-print(f"PostgreSQL database version: {db_version[0]}")
+    // When the 'new_user' event is received from the server, this function is called
+    // The 'updatedUsers' parameter contains the updated list of users
+    socket.on('new_user', (updatedUsers) => {
+        // Update the 'users' state with the new list of users
+        setUsers(updatedUsers);
+    });
 
-except Exception as e:
-print(f"Error connecting to database: {e}")
-finally:
-    # Close the connection
-if conn:
-    conn.close()
-print("Database connection closed.")
+    // When the 'user_update' event is received from the server, this function is called
+    // The 'updatedUsers' parameter contains the updated list of users
+    socket.on('user_update', (updatedUsers) => {
+        // Update the 'users' state with the new list of users
+        setUsers(updatedUsers);
+    });
+
+    // This function is called when the component is unmounted or when the 'socket' dependency changes
+    // It is used to clean up the event listeners
+    return () => {
+        // Remove the event listeners for the 'new_message', 'new_user', and 'user_update' events
+        socket.off('new_message');
+        socket.off('new_user');
+        socket.off('user_update');
+    };
+}, [socket]); // The useEffect will run whenever the 'socket' dependency changes

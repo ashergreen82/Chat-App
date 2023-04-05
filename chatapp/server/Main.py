@@ -3,10 +3,12 @@ from flask import Flask, request, jsonify
 from flask_restful import Resource, Api
 from flask_cors import CORS
 from datetime import datetime, timedelta
+from flask_socketio import SocketIO, emit
 import os
 import json
-
 # Database connections
+
+
 def open_database_connection():
     try:
         conn = psycopg2.connect(
@@ -28,15 +30,28 @@ def open_database_connection():
     except Exception as e:
         print(f"Error connecting to database: {e}")
 
+
 def close_database_connection(conn, cur):
     cur.close()
     conn.close()
     print("Database connection closed.")
 
+# Initialize Flask
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
+# Initialize socket IO connection
+socketio = SocketIO(app, cors_allowed_origins="*")
 
+# Event handlers for connection disoconnection
+@socketio.on('connect')
+def handle_connect():
+    print('Client connected:', request.sid)
+
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    print('Client disconnected:', request.sid)
 # print(results1)
 # print(results)
 
@@ -128,6 +143,8 @@ else:
 # insert_messages(messages_data)
 
 # User login process
+
+
 @app.route('/login', methods=['POST'])
 def login():
     # get the username and password from the request
@@ -145,7 +162,8 @@ def login():
     conn, cur = open_database_connection()
 
     # Execute a SELECT statement to retrieve the user with the matching username and password
-    cur.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
+    cur.execute(
+        "SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
 
     # Fetch the results and store them in a variable
     user = cur.fetchone()
@@ -172,18 +190,23 @@ def login():
     if user is not None:
         # Update the last_active_at value for the user in the database
         conn, cur = open_database_connection()
-        cur.execute("UPDATE users SET last_active_at = NOW() WHERE id = %s", (user[0],))
+        cur.execute(
+            "UPDATE users SET last_active_at = NOW() WHERE id = %s", (user[0],))
         conn.commit()
         close_database_connection(conn, cur)
         user_name = user[1]
         user_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print(f"{user_name} logged in at {user_date}.")
 
+        socketio.emit('user_login', {
+            'username': user_name
+        })
+
         return jsonify({'message': 'login successful'})
 
     # if no user was found, return an error message
     else:
-        return jsonify({'message': 'invalid username or password'})
+        return jsonify({'message': 'Invalid username or password'})
 
     # if user_verified:
     #     with open(users_file_path, 'w') as f:
@@ -195,6 +218,8 @@ def login():
     #     return jsonify({'message': 'invalid username or password'})
 
 # Creates a new user
+
+
 @app.route('/register', methods=['POST'])
 def register():
     # get the new user information from the request
@@ -229,9 +254,10 @@ def register():
         'password': password
     }
     # Insert the new user into the Users table
-    cur.execute("INSERT INTO Users (username, password, date_created, last_active_at) VALUES (%s, %s, NOW(), NOW())", (new_user['name'], new_user['password']))
+    cur.execute("INSERT INTO Users (username, password, date_created, last_active_at) VALUES (%s, %s, NOW(), NOW())",
+                (new_user['name'], new_user['password']))
     conn.commit()
-
+    username = new_user['name']
     # Close the database connection
     close_database_connection(conn, cur)
     # new_user = {
@@ -245,6 +271,9 @@ def register():
     # save the updated user data to the JSON file
     # with open(users_file_path, 'w') as f:
     #     json.dump(user_data, f)
+    socketio.emit('user_login', {
+        'username': username
+    })
 
     return jsonify({'message': 'registration successful'})
 
@@ -255,10 +284,11 @@ def get_users():
     # one_hour_ago = datetime.now() - timedelta(hours=1)
 
     # Open a connection to the database
-    conn,cur = open_database_connection()
+    conn, cur = open_database_connection()
 
     # Execute a SELECT statement to retrieve active users from the database
-    cur.execute("SELECT * FROM users WHERE last_active_at > NOW() - INTERVAL '1 hour'")
+    cur.execute(
+        "SELECT * FROM users WHERE last_active_at > NOW() - INTERVAL '1 hour'")
     active_users = cur.fetchall()
 
     # Close the database connection
@@ -269,11 +299,9 @@ def get_users():
     #     last_active_at = datetime.strptime(
     #         user['last_active_at'], '%Y-%m-%d %H:%M:%S')
 
-        # # Compare the last_active_at value with the time one hour ago
-        # if last_active_at > one_hour_ago:
-        #     active_users.append(user)
-
-
+    # # Compare the last_active_at value with the time one hour ago
+    # if last_active_at > one_hour_ago:
+    #     active_users.append(user)
 
     # Convert the results to a list of dictionaries
     active_users_list = []
@@ -335,7 +363,8 @@ def messages():
             return jsonify({'message': 'User not found'})
 
         # Insert the new message into the Messages table
-        cur.execute("INSERT INTO Messages (user_id, message, timestamp) VALUES (%s, %s, NOW())", (user[0], message))
+        cur.execute(
+            "INSERT INTO Messages (user_id, message, timestamp) VALUES (%s, %s, NOW())", (user[0], message))
         conn.commit()
         # Close the database connection
         close_database_connection(conn, cur)
@@ -351,10 +380,17 @@ def messages():
         print(f"{user_name}'s message was added successfully")
         print(f"Message added was: {message}")
 
-        return jsonify({
+        # After successfully adding the message to the database, emit the 'new_message' event
+        socketio.emit('new_message', {
             'username': user_name,
-            'message_content': message
+            'message_content': message,
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         })
+
+        # return jsonify({
+        #     'username': user_name,
+        #     'message_content': message
+        # })
     else:
         # Retrieve all messages
         # Open a connection to the database
@@ -383,5 +419,7 @@ def messages():
 
         return jsonify({'messages': messages})
 
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    # app.run(debug=True)
+    socketio.run(app, allow_unsafe_werkzeug=True, debug=True)

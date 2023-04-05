@@ -11,7 +11,7 @@ SELECT username, last_active_at;
 ALTER TABLE Users ALTER COLUMN last_active_at SET DEFAULT NOW();
 
 UPDATE users SET last_active_at = DEFAULT WHERE id = 12;
-UPDATE users SET last_active_at = NOW() WHERE id = 12;
+UPDATE users SET last_active_at = '2023-03-27 20:43:45' WHERE id = 12;
 
 INSERT INTO Messages (username, message, timestamp) VALUES (Jack,"Hello", NOW())
 SELECT id FROM Users WHERE username = 'Asher';

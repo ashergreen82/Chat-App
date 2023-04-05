@@ -2,13 +2,40 @@ import { useState, useRef, useEffect } from 'react';
 // import usersData from './users.json';
 import axios from 'axios';
 // import messagesData from './messages.json';
+import { io } from 'socket.io-client';
+
+const socket = io('http://localhost:5000');
 
 function Chat({ username, handleLogout }) {
-    // const [messages, setMessages] = useState([])
     const [messages, setMessages] = useState([]);
     const [users, setUsers] = useState([])
-    // const users = usersData.users;
     const chatBoxRef = useRef(null);
+
+    // Updates any new users who have logged in
+    useEffect(() => {
+        if (!socket) return;
+
+        // Listen for new messages
+        socket.on('new_message', (message) => {
+            setMessages((prevMessages) => [...prevMessages, message]);
+        });
+
+        // // Listen for new user updates
+        // socket.on('new_user', (updatedUsers) => {
+        //     setUsers(updatedUsers);
+        // });
+
+        // Listen for user updates (existing code)
+        socket.on('user_update', (updatedUsers) => {
+            setUsers(updatedUsers);
+        });
+
+        return () => {
+            socket.off('new_message');
+            // socket.off('new_user');
+            socket.off('user_update');
+        };
+    }, [socket]);
 
     // Handles messages entered by the user
     const handleSubmit = async (event) => {
@@ -22,15 +49,33 @@ function Chat({ username, handleLogout }) {
                 message: newMessageContent,
             });
             const newMessage = response.data;
-            // setMessages([...messages, newMessage]);
-            fetchUserMessage();
+            socket.emit('sendMessage', newMessage);
             messageInput.value = '';
         } catch (error) {
             console.error(error);
         }
     };
 
-    // Gets list of current logged in users and displayes them in the user box
+    // const handleSubmit = async (event) => {
+    //     event.preventDefault();
+    //     const messageInput = event.target.elements.message;
+    //     const newMessageContent = messageInput.value;
+
+    //     try {
+    //         const response = await axios.post('http://localhost:5000/messages', {
+    //             user_name: username,
+    //             message: newMessageContent,
+    //         });
+    //         const newMessage = response.data;
+    //         // setMessages([...messages, newMessage]);
+    //         fetchUserMessage();
+    //         messageInput.value = '';
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
+
+    // Gets list of current logged in users and displayes them in the user box on startup
     useEffect(() => {
         console.log("useEffect function to list users has ran")
         // Fetch the list of users from the server when the component mounts
@@ -55,14 +100,14 @@ function Chat({ username, handleLogout }) {
 
     // This function allows the user who just submitted a message to see their message they just typed in
     // Adding the variable "messages" to the useEffect only causes unnessary pings to the server every second.
-    async function fetchUserMessage() {
-        try {
-            const response = await axios.get('http://localhost:5000/messages');
-            setMessages(response.data.messages);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    // async function fetchUserMessage() {
+    //     try {
+    //         const response = await axios.get('http://localhost:5000/messages');
+    //         setMessages(response.data.messages);
+    //     } catch (error) {
+    //         console.error(error);
+    //     }
+    // };
 
     // Scroll to the bottom of the message container when a new message is received
     useEffect(() => {
@@ -82,8 +127,8 @@ function Chat({ username, handleLogout }) {
                             <ul className="list-unstyled">
                                 <li>{username}</li>
                                 {users.map((user) => {
-                                    if (user.name !== username) {
-                                        return <li key={user.id}>{user.name}</li>;
+                                    if (user.username !== username) {
+                                        return <li key={user.id}>{user.username}</li>;
                                     } else {
                                         return null;
                                     }
@@ -97,7 +142,7 @@ function Chat({ username, handleLogout }) {
                                 <div className="chat-box border-primary h-100 overflow-auto" style={{ minHeight: '400px', maxHeight: "400px", overflowY: 'auto' }} ref={chatBoxRef}>
                                     {messages.map((message) => (
                                         <div className="outgoing-message" key={message.message_id}>
-                                            <span className="message-user pull-left">{message.user_name}:</span> {message.message}
+                                            <span className="message-user pull-left">{message.username}:</span> {message.message}
                                         </div>
                                     ))}
                                 </div>
