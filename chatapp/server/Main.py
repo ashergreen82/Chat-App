@@ -8,7 +8,6 @@ import os
 import json
 # Database connections
 
-
 def open_database_connection():
     try:
         conn = psycopg2.connect(
@@ -40,8 +39,10 @@ def close_database_connection(conn, cur):
 app = Flask(__name__)
 api = Api(app)
 CORS(app)
+
 # Initialize socket IO connection
 socketio = SocketIO(app, cors_allowed_origins="*")
+connected_users=[]
 
 # Event handlers for connection disoconnection
 @socketio.on('connect')
@@ -64,8 +65,8 @@ users_file_path = os.path.join(dir_path, '..', 'client', 'src', 'users.json')
 # load the user information from the JSON file
 # with open('users.json') as f:
 #     user_data = json.load(f)
-with open(users_file_path, 'r') as f:
-    user_data = json.load(f)
+# with open(users_file_path, 'r') as f:
+#     user_data = json.load(f)
     # user_data_to_be_converted = user_data["users"]
 
 # Specify path to the userlogin.json file which holds the informatoin on who is logged in.
@@ -77,74 +78,34 @@ if os.path.exists(userlogin_file_path) and os.path.getsize(userlogin_file_path) 
         userlogin_data = json.load(f)
 else:
     userlogin_data = {}
+# Fetch active user routine
+def fetch_active_users():
+    # Open a connection to the database
+    conn, cur = open_database_connection()
 
-# def insert_users(user_data):
-#     # Connect to the PostgreSQL database
-#     conn, cur = open_database_connection()
-#
-#     try:
-#         for user in user_data:
-#             cur.execute("""
-#                 INSERT INTO users (username, password, last_active_at)
-#                 VALUES (%s, %s, %s)
-#                 ON CONFLICT (username) DO NOTHING
-#             """, (user['name'], user['password'], user['last_active_at']))
-#
-#         # Commit the changes to the database
-#         conn.commit()
-#         print("User data inserted successfully!")
-#     except Exception as e:
-#         print(f"Error inserting user data: {e}")
-#
-#     # Close the PostgreSQL database connection
-#     close_database_connection(conn, cur)
+    # Execute a SELECT statement to retrieve active users from the database
+    cur.execute(
+        "SELECT * FROM users WHERE last_active_at > NOW() - INTERVAL '1 hour'")
+    active_users = cur.fetchall()
 
-# insert_users(user_data_to_be_converted)
+    # Close the database connection
+    close_database_connection(conn, cur)
 
-# def insert_messages(message_data):
-#     # Assuming you have a connection to the database and a valid cursor object
-#     conn, cur = open_database_connection()
-#
-#     # Iterate through the messages and insert them into the database
-#     for message in message_data:
-#         user_name = message["user_name"]
-#         message_text = message["message"]
-#         timestamp = message["timestamp"]
-#
-#         # Get the user ID associated with the user_name
-#         cur.execute("SELECT id FROM users WHERE username = %s;", (user_name,))
-#         user_id_result = cur.fetchone()
-#
-#         # If a user with the given user_name exists, insert the message
-#         if user_id_result:
-#             user_id = user_id_result[0]
-#
-#             # Prepare the INSERT statement
-#             insert_query = """
-#             INSERT INTO messages (user_id, message, timestamp)
-#             VALUES (%s, %s, %s);
-#             """
-#
-#             # Execute the INSERT statement
-#             cur.execute(insert_query, (user_id, message_text, timestamp))
-#         else:
-#             print(f"No user found with the name: {user_name}")
-#
-#     # Commit the changes to the database
-#     conn.commit()
-#
-#     # Close the database connection
-#     close_database_connection(conn, cur)
-#
-# messages_file_path = os.path.join(dir_path, 'messages.json')
-# with open(messages_file_path, 'r') as f:
-#     messages_data = json.load(f)
-#     messages_data = messages_data["messages"]
-# insert_messages(messages_data)
+    # Convert the results to a list of dictionaries
+    active_users_list = []
+    for user in active_users:
+        user_dict = {
+            'id': user[0],
+            'username': user[1],
+            'password': user[2],
+            'created_on': user[3].strftime('%Y-%m-%d %H:%M:%S'),
+            'last_active_at': user[4].strftime('%Y-%m-%d %H:%M:%S')
+        }
+        active_users_list.append(user_dict)
+
+    return active_users_list
 
 # User login process
-
-
 @app.route('/login', methods=['POST'])
 def login():
     # get the username and password from the request
@@ -154,7 +115,7 @@ def login():
     print(f"data from request.json: {data}")
     print(f"Username recieved: {username}")
     print(f"Password recieved: {password}")
-    print(f"user_data: {user_data}")
+    # print(f"user_data: {user_data}")
     user_verified = False
 
     # find the user with the matching username and password
@@ -198,9 +159,15 @@ def login():
         user_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print(f"{user_name} logged in at {user_date}.")
 
-        socketio.emit('user_login', {
-            'username': user_name
-        })
+        # Get list of updated users currently logged in
+        active_users_list = fetch_active_users()
+
+        # Emit the entire list of connected users to the clients
+        socketio.emit('user_update', active_users_list)
+
+        # socketio.emit('user_update', {
+        #     'username': user_name
+        # })
 
         return jsonify({'message': 'login successful'})
 
@@ -284,15 +251,15 @@ def get_users():
     # one_hour_ago = datetime.now() - timedelta(hours=1)
 
     # Open a connection to the database
-    conn, cur = open_database_connection()
+    # conn, cur = open_database_connection()
 
     # Execute a SELECT statement to retrieve active users from the database
-    cur.execute(
-        "SELECT * FROM users WHERE last_active_at > NOW() - INTERVAL '1 hour'")
-    active_users = cur.fetchall()
+    # cur.execute(
+    #     "SELECT * FROM users WHERE last_active_at > NOW() - INTERVAL '1 hour'")
+    # active_users = cur.fetchall()
 
     # Close the database connection
-    close_database_connection(conn, cur)
+    # close_database_connection(conn, cur)
 
     # for user in user_data['users']:
     #     # Convert the last_active_at value to a datetime object
@@ -304,16 +271,18 @@ def get_users():
     #     active_users.append(user)
 
     # Convert the results to a list of dictionaries
-    active_users_list = []
-    for user in active_users:
-        user_dict = {
-            'id': user[0],
-            'username': user[1],
-            'password': user[2],
-            'created_on': user[3].strftime('%Y-%m-%d %H:%M:%S'),
-            'last_active_at': user[4].strftime('%Y-%m-%d %H:%M:%S')
-        }
-        active_users_list.append(user_dict)
+    # active_users_list = []
+    # for user in active_users:
+    #     user_dict = {
+    #         'id': user[0],
+    #         'username': user[1],
+    #         'password': user[2],
+    #         'created_on': user[3].strftime('%Y-%m-%d %H:%M:%S'),
+    #         'last_active_at': user[4].strftime('%Y-%m-%d %H:%M:%S')
+    #     }
+    #     active_users_list.append(user_dict)
+    # Fetch active users
+    active_users_list = fetch_active_users()
 
     # Sends the list of active users to the client
     response = jsonify({'users': active_users_list})
