@@ -27,7 +27,9 @@ function Chat({ username, handleLogout }) {
 
         // Listen for user updates (existing code)
         socket.on('user_update', (updatedUsers) => {
+            console.log("This is the updated users: ", updatedUsers);
             setUsers(updatedUsers);
+            console.log("This is the raw user file after setUsers did it's thing: ", users)
         });
 
         return () => {
@@ -86,6 +88,7 @@ function Chat({ username, handleLogout }) {
 
     // Gets the messasges from the server on startup
     useEffect(() => {
+        console.log("useEffect function to display messages has ran")
         const fetchMessages = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/messages');
