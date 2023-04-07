@@ -53,8 +53,6 @@ def handle_connect():
 @socketio.on('disconnect')
 def handle_disconnect():
     print('Client disconnected:', request.sid)
-# print(results1)
-# print(results)
 
 # Get the current directory of the Main.py file
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -238,50 +236,19 @@ def register():
     # save the updated user data to the JSON file
     # with open(users_file_path, 'w') as f:
     #     json.dump(user_data, f)
-    socketio.emit('user_login', {
-        'username': username
-    })
-
+    # socketio.emit('user_login', {
+    #     'username': username
+    # })
+    # Emit the entire list of connected users to the clients
+    active_users_list = fetch_active_users()
+    socketio.emit('user_update', active_users_list)
     return jsonify({'message': 'registration successful'})
 
 
 # Sends the list of users to the client
 @app.route('/users', methods=['GET'])
 def get_users():
-    # one_hour_ago = datetime.now() - timedelta(hours=1)
-
-    # Open a connection to the database
-    # conn, cur = open_database_connection()
-
-    # Execute a SELECT statement to retrieve active users from the database
-    # cur.execute(
-    #     "SELECT * FROM users WHERE last_active_at > NOW() - INTERVAL '1 hour'")
-    # active_users = cur.fetchall()
-
-    # Close the database connection
-    # close_database_connection(conn, cur)
-
-    # for user in user_data['users']:
-    #     # Convert the last_active_at value to a datetime object
-    #     last_active_at = datetime.strptime(
-    #         user['last_active_at'], '%Y-%m-%d %H:%M:%S')
-
-    # # Compare the last_active_at value with the time one hour ago
-    # if last_active_at > one_hour_ago:
-    #     active_users.append(user)
-
-    # Convert the results to a list of dictionaries
-    # active_users_list = []
-    # for user in active_users:
-    #     user_dict = {
-    #         'id': user[0],
-    #         'username': user[1],
-    #         'password': user[2],
-    #         'created_on': user[3].strftime('%Y-%m-%d %H:%M:%S'),
-    #         'last_active_at': user[4].strftime('%Y-%m-%d %H:%M:%S')
-    #     }
-    #     active_users_list.append(user_dict)
-    # Fetch active users
+    # Fetch the list of current active users
     active_users_list = fetch_active_users()
 
     # Sends the list of active users to the client
@@ -296,14 +263,15 @@ def logout():
     data = request.json
     username = data.get('username')
 
-    # remove the user from the userlogin file to mark them as logged out
-    with open(userlogin_file_path, 'r') as f:
-        userlogin_data = json.load(f)
+    # Update last_active_at column in database to hour ago
+    conn, cur = open_database_connection()
+    cur.execute("UPDATE users SET last_active_at = NOW() - INTERVAL '1 hour' WHERE username = %s", (username,))
+    conn.commit()
+    close_database_connection(conn, cur)
 
-    userlogin_data['users'] = [
-        user for user in userlogin_data['users'] if user['name'] != username]
-    with open(userlogin_file_path, 'w') as f:
-        json.dump(userlogin_data, f)
+    # Announce the updated list of currently active users
+    active_users_list = fetch_active_users()
+    socketio.emit('user_update', active_users_list)
 
     return jsonify({'message': 'logout successful'})
 
@@ -334,6 +302,7 @@ def messages():
         # Insert the new message into the Messages table
         cur.execute(
             "INSERT INTO Messages (user_id, message, timestamp) VALUES (%s, %s, NOW())", (user[0], message))
+        cur.execute("UPDATE users SET last_active_at = NOW() WHERE username = %s", (user_name,))
         conn.commit()
         # Close the database connection
         close_database_connection(conn, cur)
@@ -352,10 +321,10 @@ def messages():
         # After successfully adding the message to the database, emit the 'new_message' event
         socketio.emit('new_message', {
             'username': user_name,
-            'message_content': message,
+            'message': message,
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         })
-
+        return jsonify({'status': 'success', 'message': 'Message posted successfully'})
         # return jsonify({
         #     'username': user_name,
         #     'message_content': message
