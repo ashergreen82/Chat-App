@@ -8,8 +8,9 @@ const socket = io('http://localhost:5000');
 
 function Chat({ username, handleLogout }) {
     const [messages, setMessages] = useState([]);
-    const [users, setUsers] = useState([])
+    const [users, setUsers] = useState([]);
     const chatBoxRef = useRef(null);
+    const messageInputRef = useRef(null);
 
     // Updates any new users who have logged in
     useEffect(() => {
@@ -17,13 +18,12 @@ function Chat({ username, handleLogout }) {
 
         // Listen for new messages
         socket.on('new_message', (message) => {
+            console.log("New message received: ", message);
             setMessages((prevMessages) => [...prevMessages, message]);
+            if (messageInputRef.current) {
+                messageInputRef.current.value = '';
+            }
         });
-
-        // // Listen for new user updates
-        // socket.on('new_user', (updatedUsers) => {
-        //     setUsers(updatedUsers);
-        // });
 
         // Listen for user updates (existing code)
         socket.on('user_update', (updatedUsers) => {
@@ -51,8 +51,10 @@ function Chat({ username, handleLogout }) {
                 message: newMessageContent,
             });
             const newMessage = response.data;
-            socket.emit('sendMessage', newMessage);
-            messageInput.value = '';
+            // socket.emit('sendMessage', newMessage);
+            if (newMessage) {
+                messageInput.value = '';
+            }
         } catch (error) {
             console.error(error);
         }
@@ -161,6 +163,7 @@ function Chat({ username, handleLogout }) {
                                         placeholder="Enter your message here"
                                         aria-label="Search"
                                         name="message"
+                                        ref={messageInputRef}
                                     />
                                     <button className="btn btn-outline-success border-primary" type="submit">Send</button>
                                 </form>

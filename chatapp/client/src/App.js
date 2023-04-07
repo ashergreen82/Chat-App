@@ -62,9 +62,26 @@ function App() {
   };
 
   const handleLogout = () => {
-    console.log("User", { username }, "has logged out")
-    setIsLoggedIn(false);
-    setUsername('');
+    axios.post('http://localhost:5000/logout', {
+      username: username
+    })
+      .then(response => {
+        if (response.data.message === "logout successful") {
+          console.log("User", username, "has logged out")
+          setIsLoggedIn(false);
+          setUsername('');
+          setPassword('');
+        } else {
+          console.log("User", username, "could not be logged out");
+          alert("You could not be logged out, please notify Tech Support")
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        alert('Error logging out the user');
+      });
+
+
   };
 
   return (
