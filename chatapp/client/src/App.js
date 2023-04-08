@@ -22,6 +22,7 @@ function App() {
         if (response.data.message === "login successful") {
           setUsername(username);
           setIsLoggedIn(true);
+          localStorage.setItem('token', response.data.token); // Token recieved here
           console.log("username value in App.js is: ", username)
           console.log("Congratulations!!!  You remembered your username and password!!!!")
         } else {

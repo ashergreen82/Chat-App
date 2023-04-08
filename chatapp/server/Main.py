@@ -5,6 +5,9 @@ from flask_cors import CORS
 from datetime import datetime, timedelta
 from flask_socketio import SocketIO, emit
 import os
+import jwt
+from functools import wraps
+from flask import make_response
 import json
 # Database connections
 
@@ -49,6 +52,27 @@ connected_users=[]
 def handle_connect():
     print('Client connected:', request.sid)
 
+SECRET_KEY = "your_secret_key"
+def create_jwt_token(username):
+    payload = {
+        "username": username,
+        "exp": datetime.utcnow() + timedelta(minutes=30),
+    }
+    return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = request.headers.get("x-access-token")
+        if not token:
+            return make_response(jsonify({"message": "Token is missing!"}), 403)
+        try:
+            jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        except Exception as e:
+            return make_response(jsonify({"message": "Token is invalid!"}), 403)
+        return f(*args, **kwargs)
+
+    return decorated
 
 @socketio.on('disconnect')
 def handle_disconnect():
@@ -166,9 +190,9 @@ def login():
         # socketio.emit('user_update', {
         #     'username': user_name
         # })
-
-        return jsonify({'message': 'login successful'})
-
+        token = create_jwt_token(user_name)
+        # return jsonify({'message': 'login successful'})
+        return jsonify({'token': token})
     # if no user was found, return an error message
     else:
         return jsonify({'message': 'Invalid username or password'})
@@ -247,6 +271,7 @@ def register():
 
 # Sends the list of users to the client
 @app.route('/users', methods=['GET'])
+@token_required
 def get_users():
     # Fetch the list of current active users
     active_users_list = fetch_active_users()
@@ -277,6 +302,7 @@ def logout():
 
 
 @app.route('/messages', methods=['GET', 'POST'])
+@token_required
 def messages():
     messages_file_path = os.path.join(dir_path, 'messages.json')
     # Add a new message

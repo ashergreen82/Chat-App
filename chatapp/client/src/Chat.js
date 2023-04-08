@@ -44,6 +44,8 @@ function Chat({ username, handleLogout }) {
         event.preventDefault();
         const messageInput = event.target.elements.message;
         const newMessageContent = messageInput.value;
+        const token = localStorage.getItem('token');
+        const config = { headers: { 'Authorization': `Bearer ${token}` } };
 
         try {
             const response = await axios.post('http://localhost:5000/messages', {
@@ -83,6 +85,8 @@ function Chat({ username, handleLogout }) {
     useEffect(() => {
         console.log("useEffect function to list users has ran")
         // Fetch the list of users from the server when the component mounts
+        const token = localStorage.getItem('token');
+        const config = { headers: { 'Authorization': `Bearer ${token}` } };
         axios.get('http://localhost:5000/users')
             .then(response => setUsers(response.data.users))
             .catch(error => console.error(error));
@@ -92,6 +96,8 @@ function Chat({ username, handleLogout }) {
     useEffect(() => {
         console.log("useEffect function to display messages has ran")
         const fetchMessages = async () => {
+            const token = localStorage.getItem('token');
+            const config = { headers: { 'Authorization': `Bearer ${token}` } };
             try {
                 const response = await axios.get('http://localhost:5000/messages');
                 setMessages(response.data.messages);
