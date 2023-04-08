@@ -36,6 +36,30 @@ function App() {
       });
   };
 
+  // Guest login
+  const handleGuestLogin = (event) => {
+    event.preventDefault();
+    axios.post('http://localhost:5000/login', {
+      username: "Guest",
+      password: ""
+    })
+      .then(response => {
+        if (response.data.token) {
+          setUsername("Guest");
+          setIsLoggedIn(true);
+          localStorage.setItem('token', response.data.token); // Token recieved here
+          console.log("User logged in as Guest")
+        } else {
+          alert('Invalid token');
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        alert('Error Generated');
+      });
+  };
+
+
   // Registering a new user
   const registerUser = (event) => {
     event.preventDefault();
@@ -89,6 +113,7 @@ function App() {
         {!isLoggedIn ? (
           <Login
             handleLogin={handleLogin}
+            handleGuestLogin={handleGuestLogin}
             registerUser={registerUser}
             username={username}
             setUsername={setUsername}

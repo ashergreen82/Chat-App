@@ -171,6 +171,7 @@ function Chat({ username, handleLogout }) {
                                         aria-label="Search"
                                         name="message"
                                         ref={messageInputRef}
+                                        disabled={username === "Guest"}
                                     />
                                     <button className="btn btn-outline-success border-primary" type="submit">Send</button>
                                 </form>

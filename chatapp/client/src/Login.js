@@ -1,4 +1,4 @@
-function Login({ handleLogin, registerUser, username, setUsername, password, setPassword, confirmPassword, setConfirmPassword, isNewUser, setIsNewUser }) {
+function Login({ handleLogin, handleGuestLogin, registerUser, username, setUsername, password, setPassword, confirmPassword, setConfirmPassword, isNewUser, setIsNewUser }) {
 
     // Determins if there is new user or not.
     const toggleNewUser = () => {
@@ -42,6 +42,7 @@ function Login({ handleLogin, registerUser, username, setUsername, password, set
             <button onClick={toggleNewUser}>
                 {isNewUser ? 'Already have an account? Login' : "Don't have an account? Register"}
             </button>
+            <button onClick={handleGuestLogin}>Guest Login</button>
         </div>
     );
 }

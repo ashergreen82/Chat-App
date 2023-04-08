@@ -134,46 +134,31 @@ def fetch_active_users():
 @app.route('/login', methods=['POST'])
 def login():
     # get the username and password from the request
+    user = None
     data = request.json
     username = data.get('username')
     password = data.get('password')
     print(f"data from request.json: {data}")
     print(f"Username recieved: {username}")
     print(f"Password recieved: {password}")
-    # print(f"user_data: {user_data}")
     user_verified = False
+    if username != "Guest":
+        # find the user with the matching username and password
+        # Open a connection to the database
+        conn, cur = open_database_connection()
 
-    # find the user with the matching username and password
-    # Open a connection to the database
-    conn, cur = open_database_connection()
+        # Execute a SELECT statement to retrieve the user with the matching username and password
+        cur.execute(
+            "SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
 
-    # Execute a SELECT statement to retrieve the user with the matching username and password
-    cur.execute(
-        "SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
+        # Fetch the results and store them in a variable
+        user = cur.fetchone()
 
-    # Fetch the results and store them in a variable
-    user = cur.fetchone()
-
-    # Close the database connection
-    close_database_connection(conn, cur)
-
-    # for user in user_data['users']:
-    #     if user['name'] == username and user['password'] == password:
-    #         # with open(userlogin_file_path, 'r') as f:
-    #         #     userlogin_data = json.load(f)
-    #         user['last_active_at'] = datetime.now().strftime(
-    #             '%Y-%m-%d %H:%M:%S')
-    #         # if 'users' not in userlogin_data:
-    #         #     userlogin_data['users'] = []
-    #         user_name = user["name"]
-    #         user_date = user["last_active_at"]
-    #         # userlogin_data['users'].append({'name': username})
-    #         print(f"{user_name} logged in at {user_date}.")
-    #         user_verified = True
-    #         break
+        # Close the database connection
+        close_database_connection(conn, cur)
 
     # Check if a user was found with the matching username and password
-    if user is not None:
+    if user is not None and username != "Guest":
         # Update the last_active_at value for the user in the database
         conn, cur = open_database_connection()
         cur.execute(
@@ -189,29 +174,17 @@ def login():
 
         # Emit the entire list of connected users to the clients
         socketio.emit('user_update', active_users_list)
-
-        # socketio.emit('user_update', {
-        #     'username': user_name
-        # })
         token = create_jwt_token(user_name)
-        # return jsonify({'message': 'login successful'})
+
+        return jsonify({'token': token})
+    elif username == "Guest":
+        token = create_jwt_token(username)
         return jsonify({'token': token})
     # if no user was found, return an error message
     else:
         return jsonify({'message': 'Invalid username or password'})
 
-    # if user_verified:
-    #     with open(users_file_path, 'w') as f:
-    #         json.dump(user_data, f)
-    #     return jsonify({'message': 'login successful'})
-    #
-    # # if no user was found, return an error message
-    # else:
-    #     return jsonify({'message': 'invalid username or password'})
-
 # Creates a new user
-
-
 @app.route('/register', methods=['POST'])
 def register():
     # get the new user information from the request
