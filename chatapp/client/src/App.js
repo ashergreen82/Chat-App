@@ -19,7 +19,7 @@ function App() {
       password: password
     })
       .then(response => {
-        if (response.data.message === "login successful") {
+        if (response.data.token) {
           setUsername(username);
           setIsLoggedIn(true);
           localStorage.setItem('token', response.data.token); // Token recieved here
@@ -81,8 +81,6 @@ function App() {
         console.log(error);
         alert('Error logging out the user');
       });
-
-
   };
 
   return (

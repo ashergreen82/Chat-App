@@ -63,13 +63,16 @@ def create_jwt_token(username):
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
-        token = request.headers.get("x-access-token")
+        token = request.headers.get("Authorization")
         if not token:
             return make_response(jsonify({"message": "Token is missing!"}), 403)
+            print("Token Missing")
         try:
             jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            print("Token Processed")
         except Exception as e:
             return make_response(jsonify({"message": "Token is invalid!"}), 403)
+            print("Token is invalid")
         return f(*args, **kwargs)
 
     return decorated

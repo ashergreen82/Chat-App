@@ -12,6 +12,7 @@ function Chat({ username, handleLogout }) {
     const chatBoxRef = useRef(null);
     const messageInputRef = useRef(null);
 
+
     // Updates any new users who have logged in
     useEffect(() => {
         if (!socket) return;
@@ -45,13 +46,13 @@ function Chat({ username, handleLogout }) {
         const messageInput = event.target.elements.message;
         const newMessageContent = messageInput.value;
         const token = localStorage.getItem('token');
-        const config = { headers: { 'Authorization': `Bearer ${token}` } };
+        const config = { headers: { 'Authorization': `${token}` } };
 
         try {
             const response = await axios.post('http://localhost:5000/messages', {
                 user_name: username,
                 message: newMessageContent,
-            });
+            }, config);
             const newMessage = response.data;
             // socket.emit('sendMessage', newMessage);
             if (newMessage) {
@@ -86,8 +87,8 @@ function Chat({ username, handleLogout }) {
         console.log("useEffect function to list users has ran")
         // Fetch the list of users from the server when the component mounts
         const token = localStorage.getItem('token');
-        const config = { headers: { 'Authorization': `Bearer ${token}` } };
-        axios.get('http://localhost:5000/users')
+        const config = { headers: { 'Authorization': `${token}` } };
+        axios.get('http://localhost:5000/users', config)
             .then(response => setUsers(response.data.users))
             .catch(error => console.error(error));
     }, []);
@@ -97,9 +98,9 @@ function Chat({ username, handleLogout }) {
         console.log("useEffect function to display messages has ran")
         const fetchMessages = async () => {
             const token = localStorage.getItem('token');
-            const config = { headers: { 'Authorization': `Bearer ${token}` } };
+            const config = { headers: { 'Authorization': `${token}` } };
             try {
-                const response = await axios.get('http://localhost:5000/messages');
+                const response = await axios.get('http://localhost:5000/messages', config);
                 setMessages(response.data.messages);
             } catch (error) {
                 console.error(error);
