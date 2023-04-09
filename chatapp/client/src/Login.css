@@ -1,0 +1,59 @@
+.login-container {
+    /* background-image: url('../public/speech-bubbles-seamless-vector-background-endless-pattern-with-dialog-signs-talk-discussion-theme-social-media-communication_570429-1693.jpg'); */
+    /* background-image: url('../public/lobby.jpg'); */
+    /* background-image: url('../public/cartoon\ boardroom.jpg'); */
+    /* background-image: url('../public/boardroom\ 2.jpg'); */
+    /* background-color: white; */
+    /* background-size: cover; */
+    /* background-position: center; */
+    /* min-height: 100vh; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.button-group button {
+    flex: 1;
+    margin: 0.5rem;
+}
+
+.login-button {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 1rem;
+    /* background-color: rgba(255, 255, 255, 0.8); */
+}
+
+.login-button button {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+
+.button-register {
+    margin-right: 1rem;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.button-guest {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.message-input {
+    margin-right: 1rem;
+}
+
+.labels {
+    background-color: rgba(255, 255, 255, 0.5);
+}

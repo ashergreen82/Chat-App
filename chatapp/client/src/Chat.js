@@ -1,7 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-// import usersData from './users.json';
 import axios from 'axios';
-// import messagesData from './messages.json';
 import { io } from 'socket.io-client';
 
 const socket = io('http://localhost:5000');
@@ -35,10 +33,9 @@ function Chat({ username, handleLogout }) {
 
         return () => {
             socket.off('new_message');
-            // socket.off('new_user');
             socket.off('user_update');
         };
-    }, [socket]);
+    }, [users]);
 
     // Handles messages entered by the user
     const handleSubmit = async (event) => {
@@ -62,25 +59,6 @@ function Chat({ username, handleLogout }) {
             console.error(error);
         }
     };
-
-    // const handleSubmit = async (event) => {
-    //     event.preventDefault();
-    //     const messageInput = event.target.elements.message;
-    //     const newMessageContent = messageInput.value;
-
-    //     try {
-    //         const response = await axios.post('http://localhost:5000/messages', {
-    //             user_name: username,
-    //             message: newMessageContent,
-    //         });
-    //         const newMessage = response.data;
-    //         // setMessages([...messages, newMessage]);
-    //         fetchUserMessage();
-    //         messageInput.value = '';
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
 
     // Gets list of current logged in users and displayes them in the user box on startup
     useEffect(() => {
@@ -106,20 +84,8 @@ function Chat({ username, handleLogout }) {
                 console.error(error);
             }
         };
-
         fetchMessages();
     }, []);
-
-    // This function allows the user who just submitted a message to see their message they just typed in
-    // Adding the variable "messages" to the useEffect only causes unnessary pings to the server every second.
-    // async function fetchUserMessage() {
-    //     try {
-    //         const response = await axios.get('http://localhost:5000/messages');
-    //         setMessages(response.data.messages);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
 
     // Scroll to the bottom of the message container when a new message is received
     useEffect(() => {
@@ -137,10 +103,10 @@ function Chat({ username, handleLogout }) {
                         <div className="user-list-box border border-primary border-2" style={{ minHeight: '475px', overflowY: 'auto' }}>
                             <h4 className="user-list-heading border border-primary border-2">Users</h4>
                             <ul className="list-unstyled">
-                                <li>{username}</li>
+                                <li className="user-list-item">{username}</li>
                                 {users.map((user) => {
                                     if (user.username !== username) {
-                                        return <li key={user.id}>{user.username}</li>;
+                                        return <li key={user.id} className="user-list-item">{user.username}</li>;
                                     } else {
                                         return null;
                                     }
@@ -162,10 +128,9 @@ function Chat({ username, handleLogout }) {
                             <div className="col-md-12">
                                 <form
                                     className="d-flex flex-row justify-content-between align-items-center m-0 p-0 mt-4"
-                                    onSubmit={handleSubmit}
-                                >
+                                    onSubmit={handleSubmit}>
                                     <input
-                                        className="form-control w-100 border-primary"
+                                        className="form-control w-100 border-primary message-input"
                                         type="text"
                                         placeholder="Enter your message here"
                                         aria-label="Search"

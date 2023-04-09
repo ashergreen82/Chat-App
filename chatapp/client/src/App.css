@@ -2,6 +2,10 @@ h1 {
   text-align: center;
 }
 
+h2 {
+  text-align: center;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -47,3 +51,22 @@ h1 {
   margin-right: 10px;
   /* text-align: left; */
 }
+
+.main-container {
+  /* background-image: url('../public/speech-bubbles-seamless-vector-background-endless-pattern-with-dialog-signs-talk-discussion-theme-social-media-communication_570429-1693.jpg'); */
+  /* background-image: url('../public/lobby.jpg'); */
+  /* background-image: url('../public/cartoon\ boardroom.jpg'); */
+  background-image: url('../public/boardroom\ 2.jpg');
+  /* background-color: white; */
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+/* .user-list-item {
+  padding: 0.1rem;
+} */
+
+/* .outgoing-message {
+  padding: 0.1rem;
+} */

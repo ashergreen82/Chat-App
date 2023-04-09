@@ -96,6 +96,7 @@ function App() {
           setIsLoggedIn(false);
           setUsername('');
           setPassword('');
+          setConfirmPassword('');
         } else {
           console.log("User", username, "could not be logged out");
           alert("You could not be logged out, please notify Tech Support")
