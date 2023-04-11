@@ -1,6 +1,6 @@
 # **Super Simple Chat APP**
 
-*A basic group chat app written in Javascript, HTML, CSS, and Python, using a PostgreSQL database*
+*A basic group chat app written in Javascript, HTML, CSS, and Python, using PostgreSQL database*
 
 You can run the program from [here](https://twitter-showcase-app-ucxm.onrender.com).
 <br /><br />
