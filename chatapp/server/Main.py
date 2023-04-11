@@ -9,8 +9,8 @@ import jwt
 from functools import wraps
 from flask import make_response
 import json
-# Database connections
 
+# Database connections
 def open_database_connection():
     try:
         conn = psycopg2.connect(
@@ -87,13 +87,6 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 # Specify the relative path to the user.json file
 users_file_path = os.path.join(dir_path, '..', 'client', 'src', 'users.json')
 
-# load the user information from the JSON file
-# with open('users.json') as f:
-#     user_data = json.load(f)
-# with open(users_file_path, 'r') as f:
-#     user_data = json.load(f)
-    # user_data_to_be_converted = user_data["users"]
-
 # Specify path to the userlogin.json file which holds the informatoin on who is logged in.
 userlogin_file_path = os.path.join(os.path.dirname(__file__), 'userlogin.json')
 
@@ -103,6 +96,7 @@ if os.path.exists(userlogin_file_path) and os.path.getsize(userlogin_file_path) 
         userlogin_data = json.load(f)
 else:
     userlogin_data = {}
+
 # Fetch active user routine
 def fetch_active_users():
     # Open a connection to the database
@@ -203,17 +197,6 @@ def register():
         close_database_connection(conn, cur)
         return jsonify({'message': 'username already taken'})
 
-    # for user in user_data['users']:
-    #     if user['name'] == username:
-    #         return jsonify({'message': 'username already taken'})
-
-    # create a new user with a unique ID
-    # new_user = {
-    #     'name': username,
-    #     'password': password,
-    #     'date_created': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-    #     'last_active_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    # }
     new_user = {
         'name': username,
         'password': password
@@ -223,22 +206,10 @@ def register():
                 (new_user['name'], new_user['password']))
     conn.commit()
     username = new_user['name']
+
     # Close the database connection
     close_database_connection(conn, cur)
-    # new_user = {
-    #     'id': len(user_data['users']) + 1,
-    #     'name': username,
-    #     'password': password,
-    #     'last_active_at': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    # }
-    # user_data['users'].append(new_user)
 
-    # save the updated user data to the JSON file
-    # with open(users_file_path, 'w') as f:
-    #     json.dump(user_data, f)
-    # socketio.emit('user_login', {
-    #     'username': username
-    # })
     # Emit the entire list of connected users to the clients
     active_users_list = fetch_active_users()
     socketio.emit('user_update', active_users_list)
@@ -256,7 +227,6 @@ def get_users():
     response = jsonify({'users': active_users_list})
     print(f"List of users to be printed in user box: {active_users_list}")
     return response
-
 
 @app.route('/logout', methods=['POST'])
 def logout():
@@ -286,9 +256,6 @@ def messages():
         data = request.json
         user_name = data.get('user_name')
         message = data.get('message')
-        # message_id = len(messages_file_path) + 1
-        # message_timestamp = datetime.now().strftime(
-        #     '%Y-%m-%d %H:%M:%S')
 
         # Open a connection to the database
         conn, cur = open_database_connection()
@@ -309,14 +276,6 @@ def messages():
         # Close the database connection
         close_database_connection(conn, cur)
 
-        # Append the new message to the messages JSON file
-        # with open(messages_file_path, 'r') as f:
-        #     messages_data = json.load(f)
-        # messages_data['messages'].append(
-        #     # {'user_name': user_name, 'message': message, 'message_id': message_id}
-        #     {'message_id': message_id, 'user_name': user_name, 'message': message, 'timestamp': message_timestamp})
-        # with open(messages_file_path, 'w') as f:
-        #     json.dump(messages_data, f)
         print(f"{user_name}'s message was added successfully")
         print(f"Message added was: {message}")
 
@@ -327,17 +286,12 @@ def messages():
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         })
         return jsonify({'status': 'success', 'message': 'Message posted successfully'})
-        # return jsonify({
-        #     'username': user_name,
-        #     'message_content': message
-        # })
     else:
         # Retrieve all messages
         # Open a connection to the database
         conn, cur = open_database_connection()
 
         # Select all messages from the Messages table
-        # cur.execute("SELECT * FROM Messages ORDER BY timestamp")
         cur.execute(
             "SELECT Messages.id, Users.username, Messages.message, Messages.timestamp FROM Messages JOIN Users ON Messages.user_id = Users.id")
         messages_input = cur.fetchall()
@@ -352,10 +306,6 @@ def messages():
 
         # Close the database connection
         close_database_connection(conn, cur)
-        # messages_file_path = os.path.join(dir_path, 'messages.json')
-        # messages_file_path = os.path.join('client', 'src', 'messages.json')
-        # with open(messages_file_path, 'r') as f:
-        #     messages_data = json.load(f)
 
         return jsonify({'messages': messages})
 
