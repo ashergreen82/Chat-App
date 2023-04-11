@@ -6,7 +6,7 @@ You can run the program from [here](https://twitter-showcase-app-ucxm.onrender.c
 <br /><br />
 
 ![screenshot](login_screenshot.png)
-![screenshot](screenshot3.png)
+![screenshot](Screenshot3.png)
 
 ## **Summary**
 
