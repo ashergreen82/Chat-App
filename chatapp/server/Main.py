@@ -81,22 +81,6 @@ def token_required(f):
 def handle_disconnect():
     print('Client disconnected:', request.sid)
 
-# Get the current directory of the Main.py file
-dir_path = os.path.dirname(os.path.realpath(__file__))
-
-# Specify the relative path to the user.json file
-users_file_path = os.path.join(dir_path, '..', 'client', 'src', 'users.json')
-
-# Specify path to the userlogin.json file which holds the informatoin on who is logged in.
-userlogin_file_path = os.path.join(os.path.dirname(__file__), 'userlogin.json')
-
-# load the userlogin information from the userlogin JSON file
-if os.path.exists(userlogin_file_path) and os.path.getsize(userlogin_file_path) > 0:
-    with open(userlogin_file_path, 'r') as f:
-        userlogin_data = json.load(f)
-else:
-    userlogin_data = {}
-
 # Fetch active user routine
 def fetch_active_users():
     # Open a connection to the database
@@ -132,9 +116,6 @@ def login():
     data = request.json
     username = data.get('username')
     password = data.get('password')
-    print(f"data from request.json: {data}")
-    print(f"Username recieved: {username}")
-    print(f"Password recieved: {password}")
     user_verified = False
     if username != "Guest":
         # find the user with the matching username and password
@@ -161,7 +142,6 @@ def login():
         close_database_connection(conn, cur)
         user_name = user[1]
         user_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        print(f"{user_name} logged in at {user_date}.")
 
         # Get list of updated users currently logged in
         active_users_list = fetch_active_users()
@@ -215,7 +195,6 @@ def register():
     socketio.emit('user_update', active_users_list)
     return jsonify({'message': 'registration successful'})
 
-
 # Sends the list of users to the client
 @app.route('/users', methods=['GET'])
 @token_required
@@ -225,7 +204,6 @@ def get_users():
 
     # Sends the list of active users to the client
     response = jsonify({'users': active_users_list})
-    print(f"List of users to be printed in user box: {active_users_list}")
     return response
 
 @app.route('/logout', methods=['POST'])
@@ -246,11 +224,9 @@ def logout():
 
     return jsonify({'message': 'logout successful'})
 
-
 @app.route('/messages', methods=['GET', 'POST'])
 @token_required
 def messages():
-    messages_file_path = os.path.join(dir_path, 'messages.json')
     # Add a new message
     if request.method == 'POST':
         data = request.json
@@ -275,9 +251,6 @@ def messages():
         conn.commit()
         # Close the database connection
         close_database_connection(conn, cur)
-
-        print(f"{user_name}'s message was added successfully")
-        print(f"Message added was: {message}")
 
         # After successfully adding the message to the database, emit the 'new_message' event
         socketio.emit('new_message', {
