@@ -103,10 +103,10 @@ function Chat({ username, handleLogout }) {
                         <div className="user-list-box border border-primary border-2" style={{ minHeight: '475px', overflowY: 'auto' }}>
                             <h4 className="user-list-heading border border-primary border-2">Users</h4>
                             <ul className="list-unstyled">
-                                <li className="user-list-item">{username}</li>
+                                <li className="user-list-item ps-1">{username}</li>
                                 {users.map((user) => {
                                     if (user.username !== username) {
-                                        return <li key={user.id} className="user-list-item">{user.username}</li>;
+                                        return <li key={user.id} className="user-list-item ps-1">{user.username}</li>;
                                     } else {
                                         return null;
                                     }
@@ -120,7 +120,7 @@ function Chat({ username, handleLogout }) {
                                 <div className="chat-box border-primary h-100 overflow-auto" style={{ minHeight: '400px', maxHeight: "400px", overflowY: 'auto' }} ref={chatBoxRef}>
                                     {messages.map((message) => (
                                         <div className="outgoing-message" key={message.message_id}>
-                                            <span className="message-user pull-left">{message.username}:</span> {message.message}
+                                            <span className="message-user pull-left ps-1">{message.username}:</span> {message.message}
                                         </div>
                                     ))}
                                 </div>
