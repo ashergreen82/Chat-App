@@ -4,21 +4,30 @@ from flask_restful import Resource, Api
 from flask_cors import CORS
 from datetime import datetime, timedelta
 from flask_socketio import SocketIO, emit
+from dotenv import load_dotenv, dotenv_values
 import os
 import jwt
 from functools import wraps
 from flask import make_response
 import json
 
-# Database connections
+config = dotenv_values(".env")
+
 def open_database_connection():
     try:
+        # conn = psycopg2.connect(
+        #     host="127.0.0.1",
+        #     port=5432,
+        #     dbname="ChatApp",
+        #     user="postgres",
+        #     password="Andy"
+        # )
         conn = psycopg2.connect(
-            host="127.0.0.1",
+            host="otto.db.elephantsql.com",
             port=5432,
-            dbname="ChatApp",
-            user="postgres",
-            password="Andy"
+            dbname="dqbrbpdn",
+            user="dqbrbpdn",
+            password=config["CHAT_APP_PASSWORD"]
         )
         print("Database connected successfully!")
 
@@ -52,7 +61,7 @@ connected_users=[]
 def handle_connect():
     print('Client connected:', request.sid)
 
-SECRET_KEY = "your_secret_key"
+SECRET_KEY = config["SECRET_KEY"]
 def create_jwt_token(username):
     payload = {
         "username": username,
