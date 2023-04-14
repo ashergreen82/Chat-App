@@ -294,4 +294,4 @@ def messages():
 
 if __name__ == '__main__':
     # app.run(debug=True)
-    socketio.run(app, allow_unsafe_werkzeug=True, debug=True)
+    socketio.run(app, allow_unsafe_werkzeug=True, debug=config["DEBUG"])
