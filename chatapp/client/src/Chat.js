@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5000');
+const socket = io();
 
 function Chat({ username, handleLogout }) {
     const [messages, setMessages] = useState([]);
@@ -46,7 +46,7 @@ function Chat({ username, handleLogout }) {
         const config = { headers: { 'Authorization': `${token}` } };
 
         try {
-            const response = await axios.post('http://localhost:5000/messages', {
+            const response = await axios.post('messages', {
                 user_name: username,
                 message: newMessageContent,
             }, config);
@@ -66,7 +66,7 @@ function Chat({ username, handleLogout }) {
         // Fetch the list of users from the server when the component mounts
         const token = localStorage.getItem('token');
         const config = { headers: { 'Authorization': `${token}` } };
-        axios.get('http://localhost:5000/users', config)
+        axios.get('users', config)
             .then(response => setUsers(response.data.users))
             .catch(error => console.error(error));
     }, []);
@@ -78,7 +78,7 @@ function Chat({ username, handleLogout }) {
             const token = localStorage.getItem('token');
             const config = { headers: { 'Authorization': `${token}` } };
             try {
-                const response = await axios.get('http://localhost:5000/messages', config);
+                const response = await axios.get('messages', config);
                 setMessages(response.data.messages);
             } catch (error) {
                 console.error(error);

@@ -14,7 +14,7 @@ function App() {
   // User login
   const handleLogin = (event) => {
     event.preventDefault();
-    axios.post('http://localhost:5000/login', {
+    axios.post('login', {
       username: username,
       password: password
     })
@@ -39,7 +39,7 @@ function App() {
   // Guest login
   const handleGuestLogin = (event) => {
     event.preventDefault();
-    axios.post('http://localhost:5000/login', {
+    axios.post('login', {
       username: "Guest",
       password: ""
     })
@@ -64,7 +64,7 @@ function App() {
   const registerUser = (event) => {
     event.preventDefault();
     if (password === confirmPassword) {
-      axios.post('http://localhost:5000/register', {
+      axios.post('register', {
         username: username,
         password: password
       })
@@ -87,7 +87,7 @@ function App() {
   };
 
   const handleLogout = () => {
-    axios.post('http://localhost:5000/logout', {
+    axios.post('logout', {
       username: username
     })
       .then(response => {
