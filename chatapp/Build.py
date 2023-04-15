@@ -2,7 +2,7 @@ import os
 
 
 def setup_server():
-    os.system("pip install -r requirements.txt")
+    os.system("pip install -r ./server/requirements.txt")
 
 
 def setup_client():
