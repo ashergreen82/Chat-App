@@ -2,11 +2,11 @@ import os
 
 
 def start_server():
-    os.system("gunicorn server.Main:app")
+    os.system("./server/Scripts/gunicorn server.Main:app")
 
 
 def start_client():
-    os.system("npm start --prefix Client")
+    os.system("npm start --prefix client")
 
 
 if __name__ == "__main__":
