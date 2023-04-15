@@ -5,3 +5,5 @@ Lib
 Scripts
 __pycache__
 .env
+/build
+/client/build
