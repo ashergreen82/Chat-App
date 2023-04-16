@@ -12,7 +12,11 @@ from flask import make_response
 import json
 
 load_dotenv()
-config = dotenv_values(".env")
+# config = dotenv_values(".env")
+CHAT_APP_PASSWORD = os.environ.get("CHAT_APP_PASSWORD")
+# SECRET_KEY = config["SECRET_KEY"]
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG = os.environ.get("DEBUG")
 
 def open_database_connection():
     try:
@@ -28,7 +32,7 @@ def open_database_connection():
             port=5432,
             dbname="dqbrbpdn",
             user="dqbrbpdn",
-            password=config["CHAT_APP_PASSWORD"]
+            password= CHAT_APP_PASSWORD
         )
         print("Database connected successfully!")
 
@@ -62,8 +66,6 @@ connected_users=[]
 def handle_connect():
     print('Client connected:', request.sid)
 
-# SECRET_KEY = config["SECRET_KEY"]
-SECRET_KEY = os.environ.get("SECRET_KEY")
 def create_jwt_token(username):
     payload = {
         "username": username,
@@ -296,4 +298,4 @@ def messages():
 
 if __name__ == '__main__':
     # app.run(debug=True)
-    socketio.run(app, allow_unsafe_werkzeug=True, debug=config["DEBUG"])
+    socketio.run(app, allow_unsafe_werkzeug=True, debug=DEBUG)
