@@ -51,7 +51,7 @@ function Chat({ username, handleLogout }) {
                 message: newMessageContent,
             }, config);
             const newMessage = response.data;
-            // socket.emit('sendMessage', newMessage);
+            socket.emit('sendMessage', newMessage);
             if (newMessage) {
                 messageInput.value = '';
             }
