@@ -163,6 +163,7 @@ def login():
         # Emit the entire list of connected users to the clients
         socketio.emit('user_update', active_users_list)
         token = create_jwt_token(user_name)
+        print(f"{username} login has been broadcasted")
 
         return jsonify({'token': token})
     elif username == "Guest":
@@ -207,6 +208,7 @@ def register():
     # Emit the entire list of connected users to the clients
     active_users_list = fetch_active_users()
     socketio.emit('user_update', active_users_list)
+    print(f"New user named {username} has been created and joined the chat")
     return jsonify({'message': 'registration successful'})
 
 # Sends the list of users to the client
@@ -235,6 +237,7 @@ def logout():
     # Announce the updated list of currently active users
     active_users_list = fetch_active_users()
     socketio.emit('user_update', active_users_list)
+    print(f"{username} has logged out succdessfully")
 
     return jsonify({'message': 'logout successful'})
 
@@ -272,6 +275,7 @@ def messages():
             'message': message,
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         })
+        Print("Message was successfully entered")
         return jsonify({'status': 'success', 'message': 'Message posted successfully'})
     else:
         # Retrieve all messages
@@ -298,6 +302,7 @@ def messages():
 
 @app.route("/")
 def mainExecution():
+    print("mainExuceution function executed")
     return send_file("../client/build/index.html")
 
 if __name__ == '__main__':
