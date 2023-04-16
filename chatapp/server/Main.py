@@ -11,6 +11,7 @@ from functools import wraps
 from flask import make_response
 import json
 
+load_dotenv()
 config = dotenv_values(".env")
 
 def open_database_connection():
