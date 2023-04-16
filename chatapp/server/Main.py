@@ -62,7 +62,8 @@ connected_users=[]
 def handle_connect():
     print('Client connected:', request.sid)
 
-SECRET_KEY = config["SECRET_KEY"]
+# SECRET_KEY = config["SECRET_KEY"]
+SECRET_KEY = os.environ.get("SECRET_KEY")
 def create_jwt_token(username):
     payload = {
         "username": username,
