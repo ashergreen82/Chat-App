@@ -295,9 +295,10 @@ def messages():
         close_database_connection(conn, cur)
 
         return jsonify({'messages': messages})
+
 @app.route("/")
 def mainExecution():
-    return send_file("../client/build/index.html")
+    return send_file("../client/build/index.js")
 
 if __name__ == '__main__':
     # app.run(debug=True)
