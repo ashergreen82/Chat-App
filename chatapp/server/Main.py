@@ -18,10 +18,6 @@ CHAT_APP_PASSWORD = os.environ.get("CHAT_APP_PASSWORD")
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG")
 
-@app.route("/")
-def mainExecution():
-    return send_file("../client/build/index.html")
-
 def open_database_connection():
     try:
         # conn = psycopg2.connect(
@@ -299,7 +295,9 @@ def messages():
         close_database_connection(conn, cur)
 
         return jsonify({'messages': messages})
-
+@app.route("/")
+def mainExecution():
+    return send_file("../client/build/index.html")
 
 if __name__ == '__main__':
     # app.run(debug=True)
