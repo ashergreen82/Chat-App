@@ -298,7 +298,7 @@ def messages():
 
 @app.route("/")
 def mainExecution():
-    return send_file("../client/build/index.js")
+    return send_file("../client/build/index.html")
 
 if __name__ == '__main__':
     # app.run(debug=True)
