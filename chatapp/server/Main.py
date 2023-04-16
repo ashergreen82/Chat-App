@@ -13,8 +13,6 @@ import json
 
 load_dotenv()
 
-app = Flask(__name__, static_folder='../client/build', static_url_path='/')
-
 #Environment variables
 CHAT_APP_PASSWORD = os.environ.get("CHAT_APP_PASSWORD")
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -59,7 +57,8 @@ def close_database_connection(conn, cur):
     print("Database connection closed.")
 
 # Initialize Flask
-app = Flask(__name__)
+# app = Flask(__name__)
+app = Flask(__name__, static_folder='../client/build', static_url_path='/')
 api = Api(app)
 CORS(app)
 
