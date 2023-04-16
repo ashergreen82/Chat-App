@@ -12,11 +12,17 @@ from flask import make_response
 import json
 
 load_dotenv()
-# config = dotenv_values(".env")
+
+app = Flask(__name__, static_folder='../client/build', static_url_path='/')
+
+#Environment variables
 CHAT_APP_PASSWORD = os.environ.get("CHAT_APP_PASSWORD")
-# SECRET_KEY = config["SECRET_KEY"]
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG")
+
+@app.route("/")
+def mainExecution():
+    return send_file("../client/build/index.html")
 
 def open_database_connection():
     try:
