@@ -322,7 +322,7 @@ def messages():
 
 @app.route("/")
 def mainExecution():
-    print("mainExuceution function executed")
+    print("mainExecution function executed")
     return send_file("../client/build/index.html")
 
 
