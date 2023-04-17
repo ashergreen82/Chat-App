@@ -13,10 +13,11 @@ import json
 
 load_dotenv()
 
-#Environment variables
+# Environment variables
 CHAT_APP_PASSWORD = os.environ.get("CHAT_APP_PASSWORD")
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = os.environ.get("DEBUG")
+
 
 def open_database_connection():
     try:
@@ -32,7 +33,7 @@ def open_database_connection():
             port=5432,
             dbname="dqbrbpdn",
             user="dqbrbpdn",
-            password= CHAT_APP_PASSWORD
+            password=CHAT_APP_PASSWORD
         )
         print("Database connected successfully!")
 
@@ -52,6 +53,7 @@ def close_database_connection(conn, cur):
     conn.close()
     print("Database connection closed.")
 
+
 # Initialize Flask
 # app = Flask(__name__)
 app = Flask(__name__, static_folder='../client/build', static_url_path='/')
@@ -60,12 +62,15 @@ CORS(app)
 
 # Initialize socket IO connection
 socketio = SocketIO(app, cors_allowed_origins="*")
-connected_users=[]
+connected_users = []
 
 # Event handlers for connection disoconnection
+
+
 @socketio.on('connect')
 def handle_connect():
     print('Client connected:', request.sid)
+
 
 def create_jwt_token(username):
     payload = {
@@ -73,6 +78,7 @@ def create_jwt_token(username):
         "exp": datetime.utcnow() + timedelta(minutes=30),
     }
     return jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+
 
 def token_required(f):
     @wraps(f)
@@ -91,11 +97,14 @@ def token_required(f):
 
     return decorated
 
+
 @socketio.on('disconnect')
 def handle_disconnect():
     print('Client disconnected:', request.sid)
 
 # Fetch active user routine
+
+
 def fetch_active_users():
     # Open a connection to the database
     conn, cur = open_database_connection()
@@ -123,6 +132,8 @@ def fetch_active_users():
     return active_users_list
 
 # User login process
+
+
 @app.route('/login', methods=['POST'])
 def login():
     # get the username and password from the request
@@ -174,6 +185,8 @@ def login():
         return jsonify({'message': 'Invalid username or password'})
 
 # Creates a new user
+
+
 @app.route('/register', methods=['POST'])
 def register():
     # get the new user information from the request
@@ -212,6 +225,8 @@ def register():
     return jsonify({'message': 'registration successful'})
 
 # Sends the list of users to the client
+
+
 @app.route('/users', methods=['GET'])
 @token_required
 def get_users():
@@ -222,6 +237,7 @@ def get_users():
     response = jsonify({'users': active_users_list})
     return response
 
+
 @app.route('/logout', methods=['POST'])
 def logout():
     # get the username from the request
@@ -230,7 +246,8 @@ def logout():
 
     # Update last_active_at column in database to hour ago
     conn, cur = open_database_connection()
-    cur.execute("UPDATE users SET last_active_at = NOW() - INTERVAL '1 hour' WHERE username = %s", (username,))
+    cur.execute(
+        "UPDATE users SET last_active_at = NOW() - INTERVAL '1 hour' WHERE username = %s", (username,))
     conn.commit()
     close_database_connection(conn, cur)
 
@@ -240,6 +257,7 @@ def logout():
     print(f"{username} has logged out succdessfully")
 
     return jsonify({'message': 'logout successful'})
+
 
 @app.route('/messages', methods=['GET', 'POST'])
 @token_required
@@ -264,7 +282,8 @@ def messages():
         # Insert the new message into the Messages table
         cur.execute(
             "INSERT INTO Messages (user_id, message, timestamp) VALUES (%s, %s, NOW())", (user[0], message))
-        cur.execute("UPDATE users SET last_active_at = NOW() WHERE username = %s", (user_name,))
+        cur.execute(
+            "UPDATE users SET last_active_at = NOW() WHERE username = %s", (user_name,))
         conn.commit()
         # Close the database connection
         close_database_connection(conn, cur)
@@ -275,7 +294,7 @@ def messages():
             'message': message,
             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         })
-        Print("Message was successfully entered")
+        print("Message was successfully entered")
         return jsonify({'status': 'success', 'message': 'Message posted successfully'})
     else:
         # Retrieve all messages
@@ -300,10 +319,12 @@ def messages():
 
         return jsonify({'messages': messages})
 
+
 @app.route("/")
 def mainExecution():
     print("mainExuceution function executed")
     return send_file("../client/build/index.html")
+
 
 if __name__ == '__main__':
     # app.run(debug=True)
