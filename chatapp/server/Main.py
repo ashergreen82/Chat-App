@@ -53,7 +53,6 @@ def close_database_connection(conn, cur):
     conn.close()
     print("Database connection closed.")
 
-
 # Initialize Flask
 # app = Flask(__name__)
 app = Flask(__name__, static_folder='../client/build', static_url_path='/')
@@ -103,7 +102,6 @@ def handle_disconnect():
     print('Client disconnected:', request.sid)
 
 # Fetch active user routine
-
 
 def fetch_active_users():
     # Open a connection to the database
@@ -184,9 +182,8 @@ def login():
     else:
         return jsonify({'message': 'Invalid username or password'})
 
+
 # Creates a new user
-
-
 @app.route('/register', methods=['POST'])
 def register():
     # get the new user information from the request
@@ -209,6 +206,7 @@ def register():
         'name': username,
         'password': password
     }
+
     # Insert the new user into the Users table
     cur.execute("INSERT INTO Users (username, password, date_created, last_active_at) VALUES (%s, %s, NOW(), NOW())",
                 (new_user['name'], new_user['password']))
@@ -224,9 +222,8 @@ def register():
     print(f"New user named {username} has been created and joined the chat")
     return jsonify({'message': 'registration successful'})
 
+
 # Sends the list of users to the client
-
-
 @app.route('/users', methods=['GET'])
 @token_required
 def get_users():
