@@ -2,7 +2,7 @@
 
 *A basic group chat app written in Javascript, HTML, CSS, and Python, using PostgreSQL database*
 
-You can run the program from [here](https://twitter-showcase-app-ucxm.onrender.com).
+You can run the program from [here](https://chatapp-fdyf.onrender.com).
 <br /><br />
 
 ![screenshot](login_screenshot.png)
