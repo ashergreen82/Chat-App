@@ -7,3 +7,6 @@ __pycache__
 .env
 /build
 /client/build
+/android
+/ios
+
