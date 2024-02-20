@@ -1,0 +1,8 @@
+{
+  "appId": "ca.ashergreen.chat_app",
+  "appName": "chat_app",
+  "webDir": "chatapp/client/build",
+  "server": {
+    "androidScheme": "https"
+  }
+}
